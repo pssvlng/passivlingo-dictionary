@@ -1,2 +1,2 @@
 # passivlingo-dictionary
-Python library for accessing own and nltk wordnet ontologies
+Python library for accessing NLTK and OWN wordnet ontologies
