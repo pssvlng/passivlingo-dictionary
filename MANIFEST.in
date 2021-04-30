@@ -1,0 +1,2 @@
+recursive-include passivlingo_dictionary *.py
+
