@@ -29,7 +29,10 @@ class MTSearchChain(SearchChain):
         langMap.update(NLTK_TO_OWN_LANGMAP)
         langMap.update(NLTK_TO_OWN_LANGMAP_EXCLUSIONS)
         for item in langList:
-            item = CommonHelper.getWordnetLanguageCode(item, VALID_WORDNET_LANGS_OWN, langMap)
+            try:
+                item = CommonHelper.getWordnetLanguageCode(item, VALID_WORDNET_LANGS_OWN, langMap)
+            except:
+                pass    
         langList = list(set(langList))    
 
         for lang in langList:

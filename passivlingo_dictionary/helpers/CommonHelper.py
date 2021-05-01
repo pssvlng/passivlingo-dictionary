@@ -1,6 +1,38 @@
 from urllib.parse import unquote
+from passivlingo_dictionary.helpers.Constants import OWN_TO_NLTK_LANGMAP
+from passivlingo_dictionary.helpers.Constants import OWN_TO_NLTK_LANGMAP_EXCLUSIONS
+from passivlingo_dictionary.helpers.Constants import NLTK_TO_OWN_LANGMAP
+from passivlingo_dictionary.helpers.Constants import NLTK_TO_OWN_LANGMAP_EXCLUSIONS
+from passivlingo_dictionary.helpers.Constants import VALID_WORDNET_LANGS
+from passivlingo_dictionary.helpers.Constants import VALID_WORDNET_LANGS_OWN
 
 class CommonHelper:
+
+    @classmethod
+    def getLangVariant(cls, filterLang):
+        result = [filterLang]
+        
+        langMap = {}
+        langMap.update(OWN_TO_NLTK_LANGMAP)
+        langMap.update(OWN_TO_NLTK_LANGMAP_EXCLUSIONS)
+        try:
+            variant = CommonHelper.getWordnetLanguageCode(filterLang, VALID_WORDNET_LANGS, langMap)
+            result.append(variant)
+            return result
+        except:
+            pass 
+
+        langMap = {}
+        langMap.update(NLTK_TO_OWN_LANGMAP)
+        langMap.update(NLTK_TO_OWN_LANGMAP_EXCLUSIONS)
+        try:
+            variant = CommonHelper.getWordnetLanguageCode(filterLang, VALID_WORDNET_LANGS_OWN, langMap)   
+            result.append(variant)
+            return result
+        except:
+            pass    
+
+        return result
 
     @classmethod
     def getWordnetLanguageCode(cls, lang, validLangs, langMap):

@@ -17,9 +17,9 @@ def basicWordSearch():
 def basicWordSearchWithLanguageFilter():
     myDict = Dictionary()        
     searchParam = SearchParam()    
-    searchParam.woi = 'house'
-    #set language filter to Farsi (fa)    
-    searchParam.filterLang = 'fa'
+    searchParam.woi = 'Häuser'
+    #set language filter to German (de)    
+    searchParam.filterLang = 'de'
     result = myDict.findWords(searchParam)
     print(result)    
 
@@ -58,7 +58,45 @@ def categorySearchEntailment():
     #Should contain the verb 'to sleep'
     print(result2)
 
-#basicWordSearch()
+def categorySearchAntonym():
+    myDict = Dictionary()        
+    searchParam = SearchParam()    
+    searchParam.woi = 'happy'
+    result = myDict.findWords(searchParam)
+
+    searchParam.reset()
+    searchParam.wordkey = result[0].wordKey
+    searchParam.category = 'antonym'
+    searchParam.lang = result[0].lang
+    result2 = myDict.findWords(searchParam)
+
+    #result2 should contain 'unhappy'    
+    print(result2)
+
+def nltkOnlySearch():    
+    myDict = Dictionary()        
+    searchParam = SearchParam()    
+    searchParam.woi = 'happy'
+    searchParam.wordnetId = 'nltk'
+    result = myDict.findWords(searchParam)
+
+    #only results from nltk wordnet
+    print(result)
+
+def ownOnlySearch():    
+    myDict = Dictionary()        
+    searchParam = SearchParam()    
+    searchParam.woi = 'happy'
+    searchParam.wordnetId = 'own'
+    result = myDict.findWords(searchParam)
+
+    #only results from own wordnet
+    print(result)
+
+basicWordSearch()
 basicWordSearchWithLanguageFilter()
-#categorySearchHypernym()
-#categorySearchEntailment()
+categorySearchHypernym()
+categorySearchEntailment()
+categorySearchAntonym()
+nltkOnlySearch()
+ownOnlySearch()

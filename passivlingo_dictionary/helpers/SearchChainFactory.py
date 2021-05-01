@@ -13,7 +13,9 @@ from passivlingo_dictionary.helpers.CommonHelper import CommonHelper
 from passivlingo_dictionary.helpers.Constants import VALID_WORDNET_LANGS
 from passivlingo_dictionary.helpers.Constants import VALID_WORDNET_LANGS_OWN
 from passivlingo_dictionary.helpers.Constants import NLTK_TO_OWN_LANGMAP
+from passivlingo_dictionary.helpers.Constants import NLTK_TO_OWN_LANGMAP_EXCLUSIONS
 from passivlingo_dictionary.helpers.Constants import OWN_TO_NLTK_LANGMAP
+from passivlingo_dictionary.helpers.Constants import OWN_TO_NLTK_LANGMAP_EXCLUSIONS
 from passivlingo_dictionary.helpers.Constants import WORDNET_IDENTIFIER_NLTK
 from passivlingo_dictionary.wrappers.OwnWordNetWrapper import OwnWordNetWrapper
 from passivlingo_dictionary.wrappers.NltkWordNetWrapper import NltkWordNetWrapper
@@ -80,16 +82,21 @@ class SearchChainFactory:
         removeList = []
         validLangs = VALID_WORDNET_LANGS_OWN
         langMap = NLTK_TO_OWN_LANGMAP
+        exclusionLangMap = NLTK_TO_OWN_LANGMAP_EXCLUSIONS
         if wordnetId == WORDNET_IDENTIFIER_NLTK:
             validLangs = VALID_WORDNET_LANGS
             langMap = OWN_TO_NLTK_LANGMAP
+            exclusionLangMap = OWN_TO_NLTK_LANGMAP_EXCLUSIONS
         
         result = []
         for lang in langList:
             try:
                 result.append(CommonHelper.getWordnetLanguageCode(lang, validLangs, langMap)) 
             except ValueError:
-                removeList.append(lang)
+                if lang not in exclusionLangMap:
+                    removeList.append(lang)
+                else:
+                    result.append(lang)    
         
         return (result, removeList)        
 
@@ -112,7 +119,8 @@ class SearchChainFactory:
         return ContainerSearchChain(items, wordkeyArr[0], lang, wordNetWrapper)
     
     def __isMTSearchChain(self, filterLang, wordNetLangs) -> bool:
-        return filterLang and filterLang not in wordNetLangs and len(filterLang.split(',')) == 1
+        langVariants = CommonHelper.getLangVariant(filterLang)        
+        return filterLang and all(x not in langVariants for x in wordNetLangs) and len(filterLang.split(',')) == 1        
 
     def __getMTSearchChain(self, woi, filterLang, wordNetWrapper, translationProvider) -> SearchChain:
         woi = CommonHelper.sanatizeWord(woi)    
