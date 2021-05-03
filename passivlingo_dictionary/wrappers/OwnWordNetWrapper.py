@@ -61,10 +61,10 @@ class OwnWordNetWrapper(WordNetWrapper):
                 item.offset = synset.id.split('-')[1]
                 item.ili = synset.ili
                 item.wordKey = '.'.join([synset.lemmas()[0], synset.pos, synset.id.split('-')[1], synset.id.split('-')[0]])
-                item.LinguisticCounter = self.getLinguisticCounter(synset)
+                item.linguisticCounter = self.getLinguisticCounter(synset)
                 #TODO: Deprecated - use only GenericLanguageDescriptions object in future
-                item.LanguageDescriptions = self.getLanguageDescriptions(synset)
-                item.GenericLanguageDescriptions = self.getGenericLanguageDescriptions(synset)
+                item.languageDescriptions = self.getLanguageDescriptions(synset)
+                item.genericLanguageDescriptions = self.getGenericLanguageDescriptions(synset)
                 item.synonyms = self.getSynonyms(synset, synset.lemmas()[0])
                 item.lang = synset.lang                
                 item.wordnetId = 'own'
@@ -81,10 +81,10 @@ class OwnWordNetWrapper(WordNetWrapper):
         result.offset = synset.id.split('-')[1]
         result.ili = synset.ili
         result.wordKey = '.'.join([synset.lemmas()[0], synset.pos, synset.id.split('-')[1], synset.id.split('-')[0]])
-        result.LinguisticCounter = self.getLinguisticCounter(synset)
+        result.linguisticCounter = self.getLinguisticCounter(synset)
         #TODO: Deprecated - use only GenericLanguageDescriptions object in future
-        result.LanguageDescriptions = self.getLanguageDescriptions(synset)
-        result.GenericLanguageDescriptions = self.getGenericLanguageDescriptions(synset)
+        result.languageDescriptions = self.getLanguageDescriptions(synset)
+        result.genericLanguageDescriptions = self.getGenericLanguageDescriptions(synset)
         result.synonyms = self.getSynonyms(synset, synset.lemmas()[0])
         result.lang = synset.lang
         result.wordnetId = 'own'
@@ -218,6 +218,7 @@ class OwnWordNetWrapper(WordNetWrapper):
         
     def translatePos(self, woi, posToken, lang):
         lang = self.getWordnetLanguageCode(lang)
+        
         if lang not in VALID_WORDNET_LANGS_OWN:
             return []
 

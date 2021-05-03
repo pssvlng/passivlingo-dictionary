@@ -54,10 +54,10 @@ class NltkWordNetWrapper(WordNetWrapper):
                 item.example = synset.examples()[0] if len(synset.examples()) > 0 else ''
                 item.offset = synset.offset()
                 item.wordKey = synset.name()
-                item.LinguisticCounter = self.getLinguisticCounter(synset)
+                item.linguisticCounter = self.getLinguisticCounter(synset)
                 #TODO: Deprecated - use only GenericLanguageDescriptions object in future
-                item.LanguageDescriptions = self.getLanguageDescriptions(synset)
-                item.GenericLanguageDescriptions = self.getGenericLanguageDescriptions(synset)
+                item.languageDescriptions = self.getLanguageDescriptions(synset)
+                item.genericLanguageDescriptions = self.getGenericLanguageDescriptions(synset)
                 item.synonyms = self.getSynonyms(synset, synset.name().split('.')[0])
                 result.append(item)
 
@@ -73,10 +73,10 @@ class NltkWordNetWrapper(WordNetWrapper):
         result.example = synset.examples()[0] if len(synset.examples()) > 0 else ''
         result.offset = synset.offset()
         result.wordKey = synset.name()
-        result.LinguisticCounter = self.getLinguisticCounter(synset)
+        result.linguisticCounter = self.getLinguisticCounter(synset)
         #TODO: Deprecated - use only GenericLanguageDescriptions object in future
-        result.LanguageDescriptions = self.getLanguageDescriptions(synset)
-        result.GenericLanguageDescriptions = self.getGenericLanguageDescriptions(synset)
+        result.languageDescriptions = self.getLanguageDescriptions(synset)
+        result.genericLanguageDescriptions = self.getGenericLanguageDescriptions(synset)
         result.synonyms = self.getSynonyms(synset, synset.name().split('.')[0])
         
         return result        
@@ -188,6 +188,8 @@ class NltkWordNetWrapper(WordNetWrapper):
     def translatePos(self, woi, posToken, lang):
         woi = woi.replace(" ", "_")
         
+        lang = self.getWordnetLanguageCode(lang)
+
         if lang not in VALID_WORDNET_LANGS:
             return []
         woi = wn.synsets(woi, lang=lang, pos=posToken)

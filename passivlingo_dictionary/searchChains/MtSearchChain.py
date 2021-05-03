@@ -9,7 +9,7 @@ from passivlingo_dictionary.models.LanguageDescriptions import LanguageDescripti
 from passivlingo_dictionary.models.GenericLanguageDescriptions import GenericLanguageDescriptions
 from passivlingo_dictionary.models.LinguisticCounter import LinguisticCounter
 
-class MTSearchChain(SearchChain):
+class MtSearchChain(SearchChain):
 
     def __init__(self, translationProvider, woi, lang, filterLang):
         super().__init__(woi, lang)
@@ -20,9 +20,9 @@ class MTSearchChain(SearchChain):
         result = Word()       
         result.name = self.woi.replace("_", " ")                            
         result.pos = 'Machine Translation'
-        result.LinguisticCounter = LinguisticCounter()
-        result.LanguageDescriptions = LanguageDescriptions()  
-        result.GenericLanguageDescriptions = GenericLanguageDescriptions()      
+        result.linguisticCounter = LinguisticCounter()
+        result.languageDescriptions = LanguageDescriptions()  
+        result.genericLanguageDescriptions = GenericLanguageDescriptions()      
         
         langList = ['en'] + self.filterLang.split(',') if self.filterLang else VALID_EU_LANGS_OWN
         langMap = {}
@@ -37,18 +37,18 @@ class MTSearchChain(SearchChain):
 
         for lang in langList:
             translation = self.translationProvider.translate(None, lang, result.name)
-            result.LanguageDescriptions.setWordDescription(lang, translation)
-            result.GenericLanguageDescriptions.setWordDescription(lang, translation)        
+            result.languageDescriptions.setWordDescription(lang, translation)
+            result.genericLanguageDescriptions.setWordDescription(lang, translation)        
 
         if result.name.strip() == '':            
             return super().execute()
 
-        if result.LanguageDescriptions.getWordDescriptions('') == '':
+        if result.languageDescriptions.getWordDescriptions('') == '':
             return super().execute()
 
         return [result]
 
     def __repr__(self):
-        return f'MTSearchChain({self.woi})'
+        return f'MtSearchChain({self.woi})'
     def __str__(self):    
-        return f'MTSearchChain({self.woi})'
+        return f'MtSearchChain({self.woi})'

@@ -1,7 +1,7 @@
 from passivlingo_dictionary.searchChains.CategorySearchChain import CategorySearchChain
 from passivlingo_dictionary.searchChains.DefaultSearchChain import DefaultSearchChain
 from passivlingo_dictionary.searchChains.LemmaSearchChain import LemmaSearchChain
-from passivlingo_dictionary.searchChains.MTSearchChain import MTSearchChain
+from passivlingo_dictionary.searchChains.MtSearchChain import MtSearchChain
 from passivlingo_dictionary.searchChains.WordKeySearchChain import WordKeySearchChain
 from passivlingo_dictionary.searchChains.PosSearchChain import PosSearchChain
 from passivlingo_dictionary.searchChains.ContainerSearchChain import ContainerSearchChain
@@ -32,6 +32,9 @@ class SearchChainFactory:
         translationProvider = self.__getTranslationProvider(searchParam)                
         results = []
         
+        if searchParam.filterLang:
+            searchParam.filterLang = searchParam.filterLang.replace(" ", "")
+
         langDetails = self.__getWordNetLangDetails(searchParam.filterLang, searchParam.wordnetId)
         if (searchParam.filterLang and len(langDetails[0]) != 0) or not searchParam.filterLang:
             wordNetWrapper = self.__getWordNetWrapper(','.join(langDetails[0]), searchParam.wordnetId)
@@ -47,16 +50,16 @@ class SearchChainFactory:
                                           
     def __getSearchChain(self, wordNetWrapper, wordNetLangs, translationProvider, searchParam: SearchParam, filterLangs) -> SearchChain:        
         if searchParam.wordkey is not None:            
-            if self.__isMTSearchChain(filterLangs, wordNetLangs):
-                return self.__getMTSearchChain(searchParam.wordkey.split('.')[0], filterLangs, wordNetWrapper, translationProvider)
+            if self.__isMtSearchChain(filterLangs, wordNetLangs):
+                return self.__getMtSearchChain(searchParam.wordkey.split('.')[0], filterLangs, wordNetWrapper, translationProvider)
             elif self.__isWordKeySearchChain(searchParam.lang, searchParam.category, searchParam.woi, searchParam.lemma, searchParam.pos):                                   
                 return self.__getWordKeySearchChain(searchParam.wordkey, searchParam.category, searchParam.lang, filterLangs, wordNetWrapper, translationProvider)
             else:
                 raise ValueError("Invalid argument list: 'wordkey', 'lang' and 'category' required")                    
 
         if searchParam.woi is not None:            
-            if self.__isMTSearchChain(filterLangs, wordNetLangs):
-                return self.__getMTSearchChain(searchParam.woi, filterLangs, wordNetWrapper, translationProvider)    
+            if self.__isMtSearchChain(filterLangs, wordNetLangs):
+                return self.__getMtSearchChain(searchParam.woi, filterLangs, wordNetWrapper, translationProvider)    
             elif self.__isDefaultSearchChain(searchParam.category, searchParam.lang, searchParam.lemma, searchParam.pos):              
                 return self.__getDefaultSearchChain(searchParam.woi, filterLangs, wordNetWrapper, translationProvider)
             elif self.__isCategorySearchChain(searchParam.lang, searchParam.category, searchParam.lemma, searchParam.pos):                
@@ -115,16 +118,16 @@ class SearchChainFactory:
 
     def __getWordKeySearchChain(self, wordkey, category, lang, filterLang, wordNetWrapper, translationProvider) -> SearchChain:
         wordkeyArr = wordkey.split('.')        
-        items = [WordKeySearchChain(category, wordkey, lang, wordNetWrapper), MTSearchChain(translationProvider, wordkeyArr[0], lang, filterLang)]        
+        items = [WordKeySearchChain(category, wordkey, lang, wordNetWrapper), MtSearchChain(translationProvider, wordkeyArr[0], lang, filterLang)]        
         return ContainerSearchChain(items, wordkeyArr[0], lang, wordNetWrapper)
     
-    def __isMTSearchChain(self, filterLang, wordNetLangs) -> bool:
+    def __isMtSearchChain(self, filterLang, wordNetLangs) -> bool:
         langVariants = CommonHelper.getLangVariant(filterLang)        
         return filterLang and all(x not in langVariants for x in wordNetLangs) and len(filterLang.split(',')) == 1        
 
-    def __getMTSearchChain(self, woi, filterLang, wordNetWrapper, translationProvider) -> SearchChain:
+    def __getMtSearchChain(self, woi, filterLang, wordNetWrapper, translationProvider) -> SearchChain:
         woi = CommonHelper.sanatizeWord(woi)    
-        items = [MTSearchChain(translationProvider, woi, None, filterLang)]
+        items = [MtSearchChain(translationProvider, woi, None, filterLang)]
         return  ContainerSearchChain(items, woi, None, wordNetWrapper)
 
     def __isDefaultSearchChain(self, category, lang, lemma, pos) -> bool:
@@ -132,7 +135,7 @@ class SearchChainFactory:
 
     def __getDefaultSearchChain(self, woi, filterLang, wordNetWrapper, translationProvider) -> SearchChain:
         woi = CommonHelper.sanatizeWord(woi)    
-        items = [DefaultSearchChain(woi, None, wordNetWrapper), LemmaSearchChain(woi, None, wordNetWrapper), MTSearchChain(translationProvider, woi, None, filterLang)]         
+        items = [DefaultSearchChain(woi, None, wordNetWrapper), LemmaSearchChain(woi, None, wordNetWrapper), MtSearchChain(translationProvider, woi, None, filterLang)]         
         return  ContainerSearchChain(items, woi, None, wordNetWrapper)
     
     def __isCategorySearchChain(self, lang, category, lemma, pos) -> bool:
@@ -140,7 +143,7 @@ class SearchChainFactory:
 
     def __getCategorySearchChain(self, woi, lang, category, filterLang, wordNetWrapper, translationProvider) -> SearchChain:        
         woi = CommonHelper.sanatizeWord(woi)
-        items = [CategorySearchChain(category, woi, lang, wordNetWrapper), DefaultSearchChain(woi, lang, wordNetWrapper), LemmaSearchChain(woi, lang, wordNetWrapper), MTSearchChain(translationProvider, woi, lang, filterLang)]        
+        items = [CategorySearchChain(category, woi, lang, wordNetWrapper), DefaultSearchChain(woi, lang, wordNetWrapper), LemmaSearchChain(woi, lang, wordNetWrapper), MtSearchChain(translationProvider, woi, lang, filterLang)]        
         return ContainerSearchChain(items, woi, lang, wordNetWrapper)
     
     def __isPosSearchChain(self, lang, lemma, pos, category) -> bool:
@@ -148,5 +151,5 @@ class SearchChainFactory:
 
     def __getPosSearchChain(self, woi, lang, lemma, pos, filterLang, wordNetWrapper, translationProvider) -> SearchChain:
         woi = CommonHelper.sanatizeWord(woi)
-        items = [PosSearchChain(pos, woi, lang, wordNetWrapper), DefaultSearchChain(woi, lang, wordNetWrapper), MTSearchChain(translationProvider, woi, lang, filterLang)]        
+        items = [PosSearchChain(pos, lemma, lang, wordNetWrapper), DefaultSearchChain(woi, lang, wordNetWrapper), MtSearchChain(translationProvider, woi, lang, filterLang)]        
         return ContainerSearchChain(items, woi, lang, wordNetWrapper)   

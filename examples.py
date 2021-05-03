@@ -1,5 +1,10 @@
 from passivlingo_dictionary.Dictionary import Dictionary
 from passivlingo_dictionary.models.SearchParam import SearchParam
+from passivlingo_dictionary.TextProcessor import TextProcessor
+
+#========================
+# Word Search Examples  
+#========================
 
 def basicWordSearch():
     myDict = Dictionary()
@@ -9,7 +14,7 @@ def basicWordSearch():
     #Specify the word to search for: woi = Word of Interest
     searchParam.woi = 'happy'
     #If searchParam.filterLang property is left empty,
-    #then the search will use most important EU languages: EN, DE, FR, ES, IT, PT, NL
+    #then the search will find results in the most important EU languages: EN, DE, FR, ES, IT, PT, NL
     
     result = myDict.findWords(searchParam)
     print(result)
@@ -22,6 +27,11 @@ def basicWordSearchWithLanguageFilter():
     searchParam.filterLang = 'de'
     result = myDict.findWords(searchParam)
     print(result)    
+
+    #to filter on more than one language, use a comma to separate language pairs
+    searchParam.filterLang = 'de, fr, en, pt, arb, cat'
+    result = myDict.findWords(searchParam)
+    print(result)
 
 def categorySearchHypernym():
     #Step1: search for the initial word
@@ -93,6 +103,20 @@ def ownOnlySearch():
     #only results from own wordnet
     print(result)
 
+def iliLookup():
+    myDict = Dictionary()        
+    searchParam = SearchParam()    
+    searchParam.woi = 'happy'
+    searchParam.wordnetId = 'own'
+    result = myDict.findWords(searchParam)
+    #print example sentences
+    print(myDict.getExampleSentences(result[0].wordKey))
+
+    #find correpsonding Italian words and example sentences
+    result2 = myDict.getWordsFromIli(result[0].ili, 'it')    
+    print(result2)
+    print(myDict.getExampleSentences(result2[0].wordKey))
+
 basicWordSearch()
 basicWordSearchWithLanguageFilter()
 categorySearchHypernym()
@@ -100,3 +124,35 @@ categorySearchEntailment()
 categorySearchAntonym()
 nltkOnlySearch()
 ownOnlySearch()
+iliLookup()
+
+#===============================
+# Basic Text Processing Examples  
+#===============================
+
+def simpleTextProcessing():
+    sentence = 'The big black dogs came into the living room quietly.'
+    txtProcessor = TextProcessor()
+    
+    #This will extract words with the following pos tags: Noun, Verb, Adverb, Adjective
+    result = txtProcessor.tokenizeSentence(sentence, 'en')
+    # = dogs
+    print(result[2].name)
+    # = dog
+    print(result[2].lemma)
+    # = Noun
+    print(result[2].pos)
+
+    myDict = Dictionary()
+    searchParam = SearchParam()
+    #woi and lemma required
+    searchParam.woi = result[2].name
+    searchParam.lemma = result[2].lemma
+    searchParam.pos = result[2].pos    
+    searchParam.lang = 'en'
+
+    #returns all words that has value of 'dog' and has pos of 'Noun' in Wordnet
+    result2 = myDict.findWords(searchParam)
+    print(result2)
+
+simpleTextProcessing()

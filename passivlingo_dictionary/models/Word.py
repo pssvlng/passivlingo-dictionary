@@ -5,9 +5,9 @@ class Word(BaseWord):
         super().__init__()                
         self.definition = ''
         self.example = ''        
-        self.LinguisticCounter = None
-        self.LanguageDescriptions = None
-        self.GenericLanguageDescriptions = None
+        self.linguisticCounter = None
+        self.languageDescriptions = None
+        self.genericLanguageDescriptions = None
         self.synonyms = ''
 
     def __repr__(self):

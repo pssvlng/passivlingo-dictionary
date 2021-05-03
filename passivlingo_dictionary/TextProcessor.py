@@ -1,17 +1,17 @@
 import nltk
 from urllib.parse import unquote
-from helpers.FactoryMethods import FactoryMethods
+from passivlingo_dictionary.helpers.FactoryMethods import FactoryMethods
 
 class TextProcessor:
 
-    def TokenizeParagraph(self, paragraph: str):
+    def tokenizeParagraph(self, paragraph: str):
         if paragraph is None:
             raise ValueError("Invalid argument list: 'paragraph' required")
 
         paragraph = unquote(paragraph)
         return nltk.sent_tokenize(paragraph)
 
-    def TokenizeSentence(self, sentence: str, lang: str):
+    def tokenizeSentence(self, sentence: str, lang: str):
         if None in [sentence, lang]:
             raise ValueError("Invalid argument list: 'lang' and 'sent' required")
         

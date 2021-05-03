@@ -1,6 +1,5 @@
 import wn    
 import os
-import platform
 
 print('Running post installation scripts ...')                       
 print('Installing OWN language data sets. This can take a while ...')
@@ -69,13 +68,9 @@ print('Installing OWN data set: Malaysian ...')
 wn.download('zsmwn:1.3+omw')
 
 print('Installing NLTK data sets. This can take a while ...')        
-oprSystem = platform.system()
-if oprSystem == 'Linux':
-    os.system('python -m nltk.downloader -d /usr/local/share/nltk_data all')
-elif platform == "Darwin":        
-    os.system('python -m nltk.downloader -d /usr/local/share/nltk_data all')
-elif platform == "Windows":
-    os.system('python -m nltk.downloader -d C:\\nltk_data all')
+os.system('python -m nltk.downloader wordnet')
+os.system('python -m nltk.downloader omw')
+os.system('python -m nltk.downloader stopwords')
 #Could possibly also be done with nltk.download('all') or nltk.download() for user interaction
 
 print('Installing spaCy data sets. This can take a while ...')        
