@@ -12,7 +12,7 @@ def basicWordSearch():
     #Setup the search parameter to pass into the dictionary
     searchParam = SearchParam()
     #Specify the word to search for: woi = Word of Interest
-    searchParam.woi = 'happy'
+    searchParam.woi = 'house'    
     #If searchParam.filterLang property is left empty,
     #then the search will find results in the most important EU languages: EN, DE, FR, ES, IT, PT, NL
     
@@ -113,7 +113,10 @@ def iliLookup():
     print(myDict.getExampleSentences(result[0].wordKey))
 
     #find correpsonding Italian words and example sentences
-    result2 = myDict.getWordsFromIli(result[0].ili, 'it')    
+    searchParam.reset()
+    searchParam.ili = result[0].ili
+    searchParam.lang = 'it'
+    result2 = myDict.findWords(searchParam)
     print(result2)
     print(myDict.getExampleSentences(result2[0].wordKey))
 

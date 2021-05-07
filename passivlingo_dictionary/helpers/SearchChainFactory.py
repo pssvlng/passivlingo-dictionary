@@ -5,6 +5,7 @@ from passivlingo_dictionary.searchChains.MtSearchChain import MtSearchChain
 from passivlingo_dictionary.searchChains.WordKeySearchChain import WordKeySearchChain
 from passivlingo_dictionary.searchChains.PosSearchChain import PosSearchChain
 from passivlingo_dictionary.searchChains.ContainerSearchChain import ContainerSearchChain
+from passivlingo_dictionary.searchChains.IliSearchChain import IliSearchChain
 from passivlingo_dictionary.searchChains.SearchChain import SearchChain
 from passivlingo_dictionary.translationProviders.EmptyTranslationProvider import EmptyTranslationProvider
 from passivlingo_dictionary.translationProviders.GoogleTranslationProvider import GoogleTranslationProvider
@@ -26,6 +27,11 @@ class SearchChainFactory:
     
     def getSearchChains(self, searchParam: SearchParam) -> []:
         
+        if searchParam.ili is not None:
+            if searchParam.lang is None:
+                raise ValueError("Invalid argument list: 'ili' and 'lang' are required")    
+            return [self.__getIliSearchChain(searchParam.ili, searchParam.lang)]
+
         if searchParam.wordkey is None and searchParam.woi is None:
             raise ValueError("Invalid argument list: 'woi' or 'wordkey' required")
 
@@ -46,7 +52,7 @@ class SearchChainFactory:
             for item in additionalSearchChains:
                 results.append(item)
 
-        return results
+        return results    
                                           
     def __getSearchChain(self, wordNetWrapper, wordNetLangs, translationProvider, searchParam: SearchParam, filterLangs) -> SearchChain:        
         if searchParam.wordkey is not None:            
@@ -112,6 +118,10 @@ class SearchChainFactory:
                 result.append(self.__getSearchChain(OwnWordNetWrapper(','.join(deltaList)), VALID_WORDNET_LANGS, translationProvider, searchParam, ','.join(deltaList)))                
                 
         return result    
+
+    def __getIliSearchChain(self, ili: str, lang: str):
+        wrapper = OwnWordNetWrapper(None)        
+        return IliSearchChain(ili, lang, wrapper)
 
     def __isWordKeySearchChain(self, lang, category, woi, lemma, pos) -> bool:
         return all(x is not None for x in [lang, category]) and all(x is None for x in [woi, lemma, pos])

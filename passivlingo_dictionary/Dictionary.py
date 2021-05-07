@@ -32,17 +32,7 @@ class Dictionary:
         wrapperToUse = OwnWordNetWrapper(None) if wordnetId == WORDNET_IDENTIFIER_OWN else NltkWordNetWrapper(None)
         synset = wnToUse.synset(wrapperToUse.getWordKey(wordKey))
 
-        return synset.examples()
-    
-    def getWordsFromIli(self, ili: str, lang: str):
-        wrapper = OwnWordNetWrapper(None)        
-        lang = wrapper.getWordnetLanguageCode(lang)
-
-        result = []        
-        for synset in wn.synsets(ili=ili, lang=lang):
-            result.append(wrapper.getWord(OwnSynsetWrapper(lang, synset)))
-
-        return result
+        return synset.examples()    
     
     def __repr__(self):
         return 'Dictionary()'

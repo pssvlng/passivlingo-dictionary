@@ -12,6 +12,7 @@ class SearchParam:
         self.filterLang = None
         self.wordnetId = None
         self.googleApiKey = None
+        self.ili = None
 
     def __repr__(self):
         return f'SearchParam({self.woi} {self.wordKey} {self.filterLang})'

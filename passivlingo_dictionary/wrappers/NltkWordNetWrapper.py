@@ -22,7 +22,7 @@ class NltkWordNetWrapper(WordNetWrapper):
                 self.filterLang.append(self.getWordnetLanguageCode(lang))
             self.filterLang = list(set(self.filterLang))
         else:
-            self.filterLang = ['fra', 'ita', 'spa', 'por', 'nld']    
+            self.filterLang = ['eng', 'fra', 'ita', 'spa', 'por', 'nld']    
             
     def getPOSDescription(self, pos):   
         if pos in ['t', 'c', 'p']:
