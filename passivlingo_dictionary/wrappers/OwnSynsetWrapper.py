@@ -9,8 +9,12 @@ class OwnSynsetWrapper:
         return self.__synset.id
     @property
     def ili(self):
-        if self.__synset.ili:
-            return self.__synset.ili.id
+        try:
+            if self.__synset.ili:            
+                return self.__synset.ili.id
+        except:
+            return ''
+            
         return ''
     @property
     def pos(self):
@@ -32,6 +36,21 @@ class OwnSynsetWrapper:
         for synset in self.__synset.hypernyms():
             result.append(OwnSynsetWrapper(self.lang, synset))
         return result
+    def hyponyms(self):
+        result = []
+        for synset in self.__synset.hyponyms():
+            result.append(OwnSynsetWrapper(self.lang, synset))
+        return result    
+    def meronyms(self):
+        result = []
+        for synset in self.__synset.meronyms():
+            result.append(OwnSynsetWrapper(self.lang, synset))
+        return result        
+    def holonyms(self):
+        result = []
+        for synset in self.__synset.holonyms():
+            result.append(OwnSynsetWrapper(self.lang, synset))
+        return result            
     def get_related(self, relation):
         result = []
         for synset in self.__synset.get_related(relation):

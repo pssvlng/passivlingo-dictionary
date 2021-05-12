@@ -12,12 +12,7 @@ class IliSearchChain(SearchChain):
     
     def execute(self):                
         lang = self.wordNetWrapper.getWordnetLanguageCode(self.lang)
-
-        result = []        
-        for synset in wn.synsets(ili=self.ili, lang=lang):
-            result.append(self.wordNetWrapper.getWord(OwnSynsetWrapper(lang, synset)))
-
-        return result            
+        return self.wordNetWrapper.getWordsFromIli(self.ili, self.lang)                
 
     def __repr__(self):
         return f'IliSearchChain({self.woi} {repr(self.wordNetWrapper)})'

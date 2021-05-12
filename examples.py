@@ -22,9 +22,9 @@ def basicWordSearch():
 def basicWordSearchWithLanguageFilter():
     myDict = Dictionary()        
     searchParam = SearchParam()    
-    searchParam.woi = 'Häuser'
+    searchParam.woi = 'house'
     #set language filter to German (de)    
-    searchParam.filterLang = 'de'
+    searchParam.filterLang = 'fas'
     result = myDict.findWords(searchParam)
     print(result)    
 
@@ -159,3 +159,7 @@ def simpleTextProcessing():
     print(result2)
 
 simpleTextProcessing()
+
+#==========
+# Wrappers  
+#==========    

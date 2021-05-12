@@ -14,9 +14,7 @@ from passivlingo_dictionary.helpers.CommonHelper import CommonHelper
 from passivlingo_dictionary.helpers.Constants import VALID_WORDNET_LANGS
 from passivlingo_dictionary.helpers.Constants import VALID_WORDNET_LANGS_OWN
 from passivlingo_dictionary.helpers.Constants import NLTK_TO_OWN_LANGMAP
-from passivlingo_dictionary.helpers.Constants import NLTK_TO_OWN_LANGMAP_EXCLUSIONS
 from passivlingo_dictionary.helpers.Constants import OWN_TO_NLTK_LANGMAP
-from passivlingo_dictionary.helpers.Constants import OWN_TO_NLTK_LANGMAP_EXCLUSIONS
 from passivlingo_dictionary.helpers.Constants import WORDNET_IDENTIFIER_NLTK
 from passivlingo_dictionary.wrappers.OwnWordNetWrapper import OwnWordNetWrapper
 from passivlingo_dictionary.wrappers.NltkWordNetWrapper import NltkWordNetWrapper
@@ -25,15 +23,10 @@ from passivlingo_dictionary.models.SearchParam import SearchParam
 
 class SearchChainFactory:        
     
-    def getSearchChains(self, searchParam: SearchParam) -> []:
-        
-        if searchParam.ili is not None:
-            if searchParam.lang is None:
-                raise ValueError("Invalid argument list: 'ili' and 'lang' are required")    
-            return [self.__getIliSearchChain(searchParam.ili, searchParam.lang)]
-
-        if searchParam.wordkey is None and searchParam.woi is None:
-            raise ValueError("Invalid argument list: 'woi' or 'wordkey' required")
+    def getSearchChains(self, searchParam: SearchParam):
+                
+        if searchParam.wordkey is None and searchParam.woi is None and searchParam.ili is None:
+            raise ValueError("Invalid argument list: 'woi' or 'wordkey' or 'ili' required")
 
         translationProvider = self.__getTranslationProvider(searchParam)                
         results = []
@@ -55,6 +48,10 @@ class SearchChainFactory:
         return results    
                                           
     def __getSearchChain(self, wordNetWrapper, wordNetLangs, translationProvider, searchParam: SearchParam, filterLangs) -> SearchChain:        
+        
+        if self.__isIliSearchChain(searchParam.ili, searchParam.lang):
+            return self.__getIliSearchChain(searchParam.ili, searchParam.lang, wordNetWrapper)
+        
         if searchParam.wordkey is not None:            
             if self.__isMtSearchChain(filterLangs, wordNetLangs):
                 return self.__getMtSearchChain(searchParam.wordkey.split('.')[0], filterLangs, wordNetWrapper, translationProvider)
@@ -88,40 +85,43 @@ class SearchChainFactory:
         if not filterLang:
             return ([], [])
         langList = filterLang.split(',')
+
         removeList = []
         validLangs = VALID_WORDNET_LANGS_OWN
-        langMap = NLTK_TO_OWN_LANGMAP
-        exclusionLangMap = NLTK_TO_OWN_LANGMAP_EXCLUSIONS
+        langMap = NLTK_TO_OWN_LANGMAP      
+        exclusionList = ['fa', 'fas']  
         if wordnetId == WORDNET_IDENTIFIER_NLTK:
             validLangs = VALID_WORDNET_LANGS
-            langMap = OWN_TO_NLTK_LANGMAP
-            exclusionLangMap = OWN_TO_NLTK_LANGMAP_EXCLUSIONS
+            langMap = OWN_TO_NLTK_LANGMAP                        
+            exclusionList = ['de', 'deu', 'ger', 'is', 'isl', 'ro', 'ron', 'sk', 'slk', 'lt', 'lit']
         
         result = []
         for lang in langList:
             try:
                 result.append(CommonHelper.getWordnetLanguageCode(lang, validLangs, langMap)) 
-            except ValueError:
-                if lang not in exclusionLangMap:
-                    removeList.append(lang)
+            except ValueError:                    
+                if lang in exclusionList:
+                    removeList.append(lang)                
                 else:
-                    result.append(lang)    
-        
+                    result.append(lang)
+                        
         return (result, removeList)        
 
-    def __getAdditionalSearchChains(self, wordnetId, deltaList, translationProvider, searchParam: SearchParam) -> []:
+    def __getAdditionalSearchChains(self, wordnetId, deltaList, translationProvider, searchParam: SearchParam):
         result = []
         if len(deltaList) > 0:
             if wordnetId != WORDNET_IDENTIFIER_NLTK:
                 result.append(self.__getSearchChain(NltkWordNetWrapper(','.join(deltaList)), VALID_WORDNET_LANGS, translationProvider, searchParam, ','.join(deltaList)))                
             else:
-                result.append(self.__getSearchChain(OwnWordNetWrapper(','.join(deltaList)), VALID_WORDNET_LANGS, translationProvider, searchParam, ','.join(deltaList)))                
+                result.append(self.__getSearchChain(OwnWordNetWrapper(','.join(deltaList)), VALID_WORDNET_LANGS_OWN, translationProvider, searchParam, ','.join(deltaList)))                
                 
         return result    
 
-    def __getIliSearchChain(self, ili: str, lang: str):
-        wrapper = OwnWordNetWrapper(None)        
-        return IliSearchChain(ili, lang, wrapper)
+    def __isIliSearchChain(self, ili, lang) -> bool:
+        return ili and lang
+
+    def __getIliSearchChain(self, ili: str, lang: str, wordNetWrapper) -> SearchChain:        
+        return IliSearchChain(ili, lang, wordNetWrapper)
 
     def __isWordKeySearchChain(self, lang, category, woi, lemma, pos) -> bool:
         return all(x is not None for x in [lang, category]) and all(x is None for x in [woi, lemma, pos])

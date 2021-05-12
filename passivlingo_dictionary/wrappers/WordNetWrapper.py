@@ -67,5 +67,8 @@ class WordNetWrapper:
 
     @abstractmethod
     def getWordnetLanguageCode(self, lang): pass        
+
+    @abstractmethod
+    def getWordsFromIli(self, ili, lang): pass        
         
     

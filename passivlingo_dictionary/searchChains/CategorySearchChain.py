@@ -13,7 +13,18 @@ class CategorySearchChain(SearchChain):
 
         if extractor != None:            
             synsets = self.wordNetWrapper.translate(self.woi, self.lang)
-            return extractor.extract(synsets)
+            result = extractor.extract(synsets)
+            if len(result) > 0:
+                return result
+
+            en_synsets = []
+            if self.lang not in ['en', 'eng']:
+                lang = self.wordNetWrapper.getWordnetLanguageCode('en')
+                for synset in synsets:
+                    if synset.ili:
+                        en_synsets.append(self.wordNetWrapper.getWordsFromIli(synset.ili, lang))
+
+                return extractor.extract(en_synsets)                            
 
         return super().execute()
 

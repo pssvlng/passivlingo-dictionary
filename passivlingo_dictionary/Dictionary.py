@@ -32,7 +32,11 @@ class Dictionary:
         wrapperToUse = OwnWordNetWrapper(None) if wordnetId == WORDNET_IDENTIFIER_OWN else NltkWordNetWrapper(None)
         synset = wnToUse.synset(wrapperToUse.getWordKey(wordKey))
 
-        return synset.examples()    
+        result = []
+        for item in synset.examples():
+            result.append(item.replace('"', ''))
+
+        return result
     
     def __repr__(self):
         return 'Dictionary()'

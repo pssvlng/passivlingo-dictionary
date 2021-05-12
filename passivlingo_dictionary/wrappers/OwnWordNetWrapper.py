@@ -98,13 +98,32 @@ class OwnWordNetWrapper(WordNetWrapper):
             count = count + len(sense.get_related('antonym'))        
         result.antonym = count
         result.hypernym = len(pSynset.hypernyms())
-        result.hyponym = len(pSynset.get_related('hyponym'))
-        result.holonym = len(pSynset.get_related('holo_member')) + len(pSynset.get_related('holo_part'))
-        result.meronym = len(pSynset.get_related('mero_member')) + len(pSynset.get_related('mero_part'))
+        result.hyponym = len(pSynset.hyponyms())
+        result.holonym = len(pSynset.holonyms())
+        result.meronym = len(pSynset.meronyms())
         result.entailment = len(pSynset.get_related('entails'))        
         result.mt = 1
 
+        if pSynset.ili and pSynset.lang != 'en':
+            result = result.add(self.__getLinguisticCounter(pSynset, 'en'))
+
         return result    
+
+    def __getLinguisticCounter(self, pSynset, lang):
+        result = LinguisticCounter()        
+        
+        for synset in wn.synsets(ili=pSynset.ili, lang=lang):
+            count = 0        
+            for sense in synset.senses():
+                count = count + len(sense.get_related('antonym'))        
+            result.antonym += count
+            result.hypernym += len(synset.hypernyms())
+            result.hyponym += len(synset.hyponyms())
+            result.holonym += len(synset.holonyms())
+            result.meronym += len(synset.meronyms())
+            result.entailment += len(synset.get_related('entails'))                    
+
+        return result
     
     def getSynonyms(self, pSynset, pName):
         results = pSynset.lemmas()        
@@ -133,15 +152,10 @@ class OwnWordNetWrapper(WordNetWrapper):
         return results 
 
     def getHolonyms(self, pSynsets):
-        results = []
-        #MEMBER HOLONYMS
+        results = []        
         for synset in pSynsets:
-            for synset2 in synset.get_related('holo_member'):
-                results.extend(self.__getRelationalSynsets(synset2))
-        #PART HOLONYMS
-        for synset in pSynsets:
-            for synset2 in synset.get_related('holo_part'):
-                results.extend(self.__getRelationalSynsets(synset2))
+            for synset2 in synset.holonyms():
+                results.extend(self.__getRelationalSynsets(synset2))       
         return results
 
     def getHypernyms(self, pSynsets):
@@ -154,20 +168,15 @@ class OwnWordNetWrapper(WordNetWrapper):
     def getHyponyms(self, pSynsets): 
         results = []
         for synset in pSynsets:
-            for synset2 in synset.get_related('hyponym'):                
+            for synset2 in synset.hyponyms():                
                 results.extend(self.__getRelationalSynsets(synset2))
         return results
 
     def getMeronyms(self, pSynsets):     
-        results = []
-        #MEMBER MERONYMS
+        results = []        
         for synset in pSynsets:
-            for synset2 in synset.get_related('mero_member'):
-                results.extend(self.__getRelationalSynsets(synset2))
-        #PART MERONYMS
-        for synset in pSynsets:
-            for synset2 in synset.get_related('mero_part'):
-                results.extend(self.__getRelationalSynsets(synset2))
+            for synset2 in synset.meronyms():
+                results.extend(self.__getRelationalSynsets(synset2))        
         return results       
 
     def __getRelationalSynsets(self, synset):
@@ -260,6 +269,13 @@ class OwnWordNetWrapper(WordNetWrapper):
         langMap.update(NLTK_TO_OWN_LANGMAP_EXCLUSIONS)
         return CommonHelper.getWordnetLanguageCode(lang, VALID_WORDNET_LANGS_OWN, langMap)
     
+    def getWordsFromIli(self, ili, lang):       
+        result = []        
+        for synset in wn.synsets(ili=ili, lang=lang):
+            result.append(self.getWord(OwnSynsetWrapper(lang, synset)))
+
+        return result    
+
     def __repr__(self):
         return 'OwnWordNetWrapper()'
     def __str__(self):    

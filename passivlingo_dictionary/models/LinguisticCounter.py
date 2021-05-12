@@ -8,6 +8,17 @@ class LinguisticCounter:
         self.entailment = 0
         self.mt = 0 #Machine Translation
 
+    def add(self, counter):
+        self.antonym += counter.antonym
+        self.hypernym += counter.hypernym
+        self.hyponym += counter.hyponym
+        self.holonym += counter.holonym
+        self.meronym += counter.meronym
+        self.entailment += counter.entailment
+        self.mt += counter.mt
+        
+        return self
+
     def __repr__(self):
         return 'LinguisticCounter()'
     def __str__(self):        

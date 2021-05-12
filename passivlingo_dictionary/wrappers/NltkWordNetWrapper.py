@@ -179,9 +179,9 @@ class NltkWordNetWrapper(WordNetWrapper):
         filterlist = ['GAP!', 'PSEUDOGAP!']
         for lemma in pSynset.lemmas(lang=plang):
             if lemma.name() not in filterlist:
-                result = result + lemma.name() + ', '
+                result = result + lemma.name() + ','
         if len(result) > 0:
-            result = result[:-2]    
+            result = result[:-1]    
 
         return result
 
@@ -231,6 +231,9 @@ class NltkWordNetWrapper(WordNetWrapper):
         langMap.update(OWN_TO_NLTK_LANGMAP)
         langMap.update(OWN_TO_NLTK_LANGMAP_EXCLUSIONS)
         return CommonHelper.getWordnetLanguageCode(lang, VALID_WORDNET_LANGS, langMap)
+
+    def getWordsFromIli(self, ili, lang):
+        return []
 
     def __repr__(self):
         return 'NltkWordNetWrapper()'
