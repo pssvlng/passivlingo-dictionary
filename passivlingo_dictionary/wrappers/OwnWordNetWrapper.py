@@ -271,8 +271,15 @@ class OwnWordNetWrapper(WordNetWrapper):
     
     def getWordsFromIli(self, ili, lang):       
         result = []        
-        for synset in wn.synsets(ili=ili, lang=lang):
-            result.append(self.getWord(OwnSynsetWrapper(lang, synset)))
+        for synset in self.getSynsetsFromIli(ili, lang):
+            result.append(self.getWord(synset))
+
+        return result    
+    
+    def getSynsetsFromIli(self, ili, lang):
+        result = []        
+        for synset in wn.synsets(ili=ili, lang=lang):            
+            result.append(OwnSynsetWrapper(lang, synset))
 
         return result    
 

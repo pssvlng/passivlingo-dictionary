@@ -10,7 +10,7 @@ class CategorySearchChain(SearchChain):
 
     def execute(self):        
         extractor = FactoryMethods.getExtractor(self.category, self.wordNetWrapper)
-
+        synsets = []
         if extractor != None:            
             synsets = self.wordNetWrapper.translate(self.woi, self.lang)
             result = extractor.extract(synsets)
@@ -22,7 +22,7 @@ class CategorySearchChain(SearchChain):
                 lang = self.wordNetWrapper.getWordnetLanguageCode('en')
                 for synset in synsets:
                     if synset.ili:
-                        en_synsets.append(self.wordNetWrapper.getWordsFromIli(synset.ili, lang))
+                        en_synsets.extend(self.wordNetWrapper.getSynsetsFromIli(synset.ili, lang))
 
                 return extractor.extract(en_synsets)                            
 

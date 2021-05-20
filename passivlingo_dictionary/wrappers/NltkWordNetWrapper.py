@@ -235,6 +235,9 @@ class NltkWordNetWrapper(WordNetWrapper):
     def getWordsFromIli(self, ili, lang):
         return []
 
+    def getSynsetsFromIli(self, ili, lang):
+        return []    
+
     def __repr__(self):
         return 'NltkWordNetWrapper()'
     def __str__(self):    

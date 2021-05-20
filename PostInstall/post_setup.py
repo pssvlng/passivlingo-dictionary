@@ -1,5 +1,7 @@
 import wn    
 import os
+import spacy
+from spacy.cli.download import download
 
 print('Running post installation scripts ...')                       
 print('Installing OWN language data sets. This can take a while ...')
@@ -68,28 +70,34 @@ print('Installing OWN data set: Malaysian ...')
 wn.download('zsmwn:1.3+omw')
 
 print('Installing NLTK data sets. This can take a while ...')        
-os.system('python -m nltk.downloader wordnet')
-os.system('python -m nltk.downloader omw')
-os.system('python -m nltk.downloader stopwords')
+os.system('python3 -m nltk.downloader wordnet')
+os.system('python3 -m nltk.downloader omw')
+os.system('python3 -m nltk.downloader stopwords')
 #Could possibly also be done with nltk.download('all') or nltk.download() for user interaction
 
 print('Installing spaCy data sets. This can take a while ...')        
-os.system('python -m spacy download en_core_web_sm')
-os.system('python -m spacy download fr_core_news_sm')
-os.system('python -m spacy download es_core_news_sm')
-os.system('python -m spacy download it_core_news_sm')
-os.system('python -m spacy download nl_core_news_sm')
-os.system('python -m spacy download nl_core_news_sm')
-os.system('python -m spacy download pt_core_news_sm')
-os.system('python -m spacy download de_core_news_sm')
-os.system('python -m spacy download zh_core_news_sm')
-os.system('python -m spacy download da_core_news_sm')
-os.system('python -m spacy download el_core_news_sm')
-os.system('python -m spacy download ja_core_news_sm')
-os.system('python -m spacy download lt_core_news_sm')
-os.system('python -m spacy download nb_core_news_sm')
-os.system('python -m spacy download pl_core_news_sm')
-os.system('python -m spacy download ro_core_news_sm')
+
+def install(lang):
+    try:
+        download(model=lang)
+    except BaseException as e:  
+        print(str(e))      
+
+print('Installing spaCy data sets. This can take a while ...')        
+install("en_core_web_sm")
+install("fr_core_news_sm")
+install("es_core_news_sm")
+install("it_core_news_sm")
+install("nl_core_news_sm")
+install("pt_core_news_sm")
+install("de_core_news_sm")
+install("da_core_news_sm")
+install("el_core_news_sm")
+install("ja_core_news_sm")
+install("lt_core_news_sm")
+install("nb_core_news_sm")
+install("pl_core_news_sm")
+install("ro_core_news_sm")
 
 
          

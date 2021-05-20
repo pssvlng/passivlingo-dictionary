@@ -1,5 +1,8 @@
-import pyttsx3
+from gtts import gTTS
 
-engine = pyttsx3.init()
-for voice in engine.getProperty('voices'):
-    print(voice)
+
+def languages():
+    """Sorted pretty printed string of supported languages"""
+    return ", ".join(sorted("{}: '{}'".format(gTTS.LANGUAGES[k], k) for k in gTTS.LANGUAGES))
+
+languages()

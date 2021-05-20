@@ -10,10 +10,23 @@ class WordKeySearchChain(SearchChain):
 
     def execute(self):                
         extractor = FactoryMethods.getExtractor(self.category, self.wordNetWrapper)
+        synset = None
         if extractor != None:
+            result = []
             if self.wordNetWrapper.isValidWordKey(self.woi):
                 synset = self.wordNetWrapper.getWordKeySynset(self.wordNetWrapper.getWordKey(self.woi), self.lang)
-                return extractor.extract([synset])            
+                result = extractor.extract([synset])
+                if len(result) > 0:
+                    return result
+
+            en_synsets = []
+            if self.lang not in ['en', 'eng']:
+                lang = self.wordNetWrapper.getWordnetLanguageCode('en')
+                if synset:
+                    if synset.ili: 
+                        en_synsets.extend(self.wordNetWrapper.getSynsetsFromIli(synset.ili, lang))
+
+                return extractor.extract(en_synsets)             
 
         return super().execute()
 

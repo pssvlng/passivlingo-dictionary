@@ -1,12 +1,13 @@
 import pyttsx3
 import sys
+import os
+import platform
+from gtts import gTTS
+from playsound import playsound
 from passivlingo_dictionary.Dictionary import Dictionary
 from passivlingo_dictionary.models.SearchParam import SearchParam
-#debian linux: sudo apt install espeak
-#windows: pip3 install pypiwin32
-#mac? 
 
-DEBIAN_LOOKUP = {
+ESPEAK_LOOKUP = {
     "als":"albanian",
     "arb":"arabic",
     "bg":"bulgarian",
@@ -29,7 +30,7 @@ DEBIAN_LOOKUP = {
     "nn":"norwegian",        
     "nl":"dutch",
     "pl":"polish",
-    "pt":"portuguese",
+    "pt":"portugal",
     "sk":"slovak",
     "sl":"slovenian",
     "sv":"swedish",
@@ -42,7 +43,63 @@ DEBIAN_LOOKUP = {
     "fas":"persian",
     "fa":"persian",
     "af":"afrikaans",
-} 
+}
+
+GTTS_LOOKUP = {
+    "als":"sq",
+    "arb":"ar",
+    "bg":"bg",
+    "ca":"ca",
+    "de":"de",
+    "da":"da",
+    "el":"el",
+    "en":"en",
+    "es":"es",
+    "eu":"eu",
+    "fi":"fi",
+    "fr":"fr",
+    "gl":"gl",
+    "he":"he",
+    "hr":"hr",
+    "id":"id",
+    "it":"it",
+    "jp":"ja",
+    "nb":"no",
+    "nn":"no",        
+    "nl":"nl",
+    "pl":"pl",
+    "pt":"pt",
+    "sk":"sk",
+    "sl":"sl",
+    "sv":"sv",
+    "th":"th",
+    "zh":"zh",
+    "zsm":"id",
+    "ro":"ro",
+    "is":"is",
+    "lt":"lt",
+    "fas":"fa",
+    "fa":"fa",
+    "af":"af",
+}
+
+def espeak(argvTransform):
+    lang = ESPEAK_LOOKUP.get(argvTransform['lang'], 'default')
+    engine = pyttsx3.init()
+    if (platform.system() == 'Windows'):
+        engine = pyttsx3.init('sapi5')
+    
+    engine.setProperty('voice', lang)
+    engine.setProperty('rate', 120)
+    engine.say(argvTransform['text'].replace("_", " "))
+    engine.runAndWait()    
+
+def gtts(argvTransform):
+    lang = GTTS_LOOKUP.get(argvTransform['lang'], 'en')    
+    tts = gTTS(argvTransform['text'].replace("_", " "), lang=lang)
+    tts.save('tmp.mp3')
+    playsound('tmp.mp3')
+    os.remove('tmp.mp3') 
 
 def main(argv):
     mydict = Dictionary()
@@ -53,12 +110,10 @@ def main(argv):
         key, value = item.split("=", 1)
         argvTransform[key] = value
     
-    lang = DEBIAN_LOOKUP.get(argvTransform['lang'], 'default')
-    engine = pyttsx3.init()
-    engine.setProperty('voice', lang)
-    engine.setProperty('rate', 120)
-    engine.say(argvTransform['text'].replace("_", " "))
-    engine.runAndWait()    
+    try:
+        gtts(argvTransform)
+    except:
+        espeak(argvTransform)
     
     print("OK")
 

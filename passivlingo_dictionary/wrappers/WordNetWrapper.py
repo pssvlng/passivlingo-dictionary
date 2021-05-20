@@ -70,5 +70,8 @@ class WordNetWrapper:
 
     @abstractmethod
     def getWordsFromIli(self, ili, lang): pass        
+
+    @abstractmethod
+    def getSynsetsFromIli(self, ili, lang): pass        
         
     
