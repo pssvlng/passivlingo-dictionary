@@ -3,9 +3,6 @@ from spacy.cli.download import download
 import os
 import wn
 
-def installDict():
-    os.system('pip3 install passivlingo-dictionary')    
-
 def installOwn():
     print('Installing OWN data set: English ...')
     wn.download('ewn:2020')
@@ -102,9 +99,6 @@ def installSpacy():
     install("ro_core_news_sm")    
 
 print('Running post installation scripts ...')                       
-
-print('Installing Passivlingo Python Library ...')                       
-installDict()
 
 print('Installing OWN language data sets. This can take a while ...')
 installOwn()
