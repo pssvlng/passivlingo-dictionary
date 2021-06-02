@@ -2,6 +2,7 @@ import pyttsx3
 import sys
 import os
 import platform
+import tempfile
 from gtts import gTTS
 from playsound import playsound
 from passivlingo_dictionary.Dictionary import Dictionary
@@ -94,12 +95,12 @@ def espeak(argvTransform):
     engine.say(argvTransform['text'].replace("_", " "))
     engine.runAndWait()    
 
-def gtts(argvTransform):
+def runGtts(argvTransform):
     lang = GTTS_LOOKUP.get(argvTransform['lang'], 'en')    
     tts = gTTS(argvTransform['text'].replace("_", " "), lang=lang)
-    tts.save('tmp.mp3')
-    playsound('tmp.mp3')
-    os.remove('tmp.mp3') 
+    file = os.path.sep.join([tempfile.gettempdir(), f"{argvTransform['text']}.mp3"])
+    tts.save(file)
+    playsound(file)    
 
 def main(argv):
     mydict = Dictionary()
@@ -111,7 +112,7 @@ def main(argv):
         argvTransform[key] = value
     
     try:
-        gtts(argvTransform)
+        runGtts(argvTransform)
     except:
         espeak(argvTransform)
     
