@@ -6,7 +6,6 @@ from types import SimpleNamespace
 
 def main(argv):
     mydict = Dictionary()
-    searchParam = SearchParam()
     argvTransform = {}
 
     argvTransform = {

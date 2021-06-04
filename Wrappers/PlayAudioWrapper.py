@@ -102,9 +102,7 @@ def runGtts(argvTransform):
     tts.save(file)
     playsound(file)    
 
-def main(argv):
-    mydict = Dictionary()
-    searchParam = SearchParam()
+def main(argv):    
     argvTransform = {}    
    
     for item in argv:
