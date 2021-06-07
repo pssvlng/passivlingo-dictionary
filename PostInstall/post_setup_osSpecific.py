@@ -20,9 +20,9 @@ elif (platform.system() == 'Darwin'):
 elif (platform.system() == 'Linux'):
     try:
         print('Installing Audio Drivers for Debian ...')    
-        os.system('sudo apt update && sudo apt install espeak ffmpeg libespeak1')
+        os.system('sudo apt install espeak')
         
         #TODO: Add for Feodora and other flavors of Linux
-        #os.system('sudo dnf upgrade && sudo dnf install espeak ffmpeg libespeak1')
+        #os.system('sudo dnf install espeak')
     except BaseException as e:  
         print(str(e))        
