@@ -1,4 +1,6 @@
 from urllib.parse import unquote
+from pathlib import Path
+import os
 from passivlingo_dictionary.helpers.Constants import OWN_TO_NLTK_LANGMAP
 from passivlingo_dictionary.helpers.Constants import OWN_TO_NLTK_LANGMAP_EXCLUSIONS
 from passivlingo_dictionary.helpers.Constants import NLTK_TO_OWN_LANGMAP
@@ -65,6 +67,14 @@ class CommonHelper:
 
     @classmethod
     def getSpacyModelName(cls, lang):
+        modelName = CommonHelper.__getSpacyModelName(lang)        
+        if os.path.isdir(os.path.join(Path.home(), '.spacy_data')):
+            return os.path.join(Path.home(), '.spacy_data', modelName)
+        else:
+            return modelName    
+
+    @classmethod
+    def __getSpacyModelName(cls, lang):
         if lang in ['fra', 'fr']:
             return 'fr_core_news_sm'
         if lang in ['spa', 'es']:
@@ -78,7 +88,7 @@ class CommonHelper:
         if lang in ['ger', 'de', 'deu']:
             return 'de_core_news_sm'   
         if lang in ['cmn', 'zh']:                                 
-            return 'zh_core_news_sm'
+            return 'zh_core_web_sm'
         if lang in ['dan', 'da']:                                 
             return 'da_core_news_sm'            
         if lang in ['ell', 'el']:                                 

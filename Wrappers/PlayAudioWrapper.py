@@ -3,6 +3,7 @@ import sys
 import os
 import platform
 import tempfile
+import time
 from gtts import gTTS
 from playsound import playsound
 from passivlingo_dictionary.Dictionary import Dictionary
@@ -86,9 +87,11 @@ GTTS_LOOKUP = {
 
 def espeak(argvTransform):
     lang = ESPEAK_LOOKUP.get(argvTransform['lang'], 'default')
-    engine = pyttsx3.init()
-    if (platform.system() == 'Windows'):
+    engine = None
+    if (platform.system() == 'Windows'):        
         engine = pyttsx3.init('sapi5')
+    else:
+        engine = pyttsx3.init()
     
     engine.setProperty('voice', lang)
     engine.setProperty('rate', 120)
@@ -98,11 +101,13 @@ def espeak(argvTransform):
 def runGtts(argvTransform):
     lang = GTTS_LOOKUP.get(argvTransform['lang'], 'en')    
     tts = gTTS(argvTransform['text'].replace("_", " "), lang=lang)
-    file = os.path.sep.join([tempfile.gettempdir(), f"{argvTransform['text']}.mp3"])
+    file = os.path.sep.join([tempfile.gettempdir(), f"{time.time()}.mp3"])
     tts.save(file)
     playsound(file)    
 
-def main(argv):    
+def main(argv):
+    mydict = Dictionary()
+    searchParam = SearchParam()
     argvTransform = {}    
    
     for item in argv:
@@ -119,5 +124,3 @@ def main(argv):
 if __name__ == "__main__":
    main(sys.argv[1:])
    
-
-
