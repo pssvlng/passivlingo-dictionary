@@ -15,3 +15,16 @@ Copyright (C) Passivlingo (www.passivlingo.com)
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  """
 
+from passivlingo_dictionary.Dictionary import Dictionary
+from passivlingo_dictionary.models.SearchParam import SearchParam
+from textblob import TextBlob
+
+param = SearchParam()
+dict = Dictionary()
+param.filterLang = 'de'
+param.woi = 'Häuser'
+#result = dict.findWords(param)
+#print(result)
+
+blob = TextBlob(param.woi)                        
+print(blob.detect_language())
