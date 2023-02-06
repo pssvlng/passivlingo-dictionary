@@ -6,23 +6,27 @@ from textblob import TextBlob
 
 class LemmaSearchChain(SearchChain):
 
-    def __init__(self, woi, lang, wordNetWrapper):
+    def __init__(self, woi, lang, wordNetWrapper, filterLang=''):
         super().__init__(woi, lang)
         self.wordNetWrapper = wordNetWrapper
+        self.filterLang = filterLang
     
     def execute(self):        
         result = []
-        if self.lang == None:
-            blob = TextBlob(self.woi)                        
-            try:
-                self.lang = self.wordNetWrapper.getWordnetLanguageCode(blob.detect_language())
-            except:
-                return super().execute()
+        def combineResults(lemmaList, lang):
+            for w in lemmaList:
+                localSynsets = self.wordNetWrapper.translate(w, lang)
+                result.extend(CombinedExtractor(self.wordNetWrapper).extract(localSynsets))
+
+        try:
+            if self.lang == None:
+                for lang in self.filterLang.split(','):        
+                    combineResults(FactoryMethods.getLemmatizer(lang).lemmatize(self.woi), lang)                        
+            else:
+                combineResults(FactoryMethods.getLemmatizer(self.lang).lemmatize(self.woi), self.lang)                                                                
         
-        lemmaList = FactoryMethods.getLemmatizer(self.lang).lemmatize(self.woi)        
-        for w in lemmaList:
-           localSynsets = self.wordNetWrapper.translate(w, self.lang)
-           result = result + CombinedExtractor(self.wordNetWrapper).extract(localSynsets)
+        except:
+            pass
 
         if len(result) > 0:
             return result   

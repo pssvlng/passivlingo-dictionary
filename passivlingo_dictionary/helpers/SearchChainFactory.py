@@ -145,7 +145,7 @@ class SearchChainFactory:
 
     def __getDefaultSearchChain(self, woi, filterLang, wordNetWrapper, translationProvider) -> SearchChain:
         woi = CommonHelper.sanatizeWord(woi)    
-        items = [DefaultSearchChain(woi, None, wordNetWrapper), LemmaSearchChain(woi, None, wordNetWrapper), MtSearchChain(translationProvider, woi, None, filterLang)]         
+        items = [DefaultSearchChain(woi, None, wordNetWrapper), LemmaSearchChain(woi, None, wordNetWrapper, filterLang), MtSearchChain(translationProvider, woi, None, filterLang)]         
         return  ContainerSearchChain(items, woi, None, wordNetWrapper)
     
     def __isCategorySearchChain(self, lang, category, lemma, pos) -> bool:

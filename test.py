@@ -21,10 +21,10 @@ from textblob import TextBlob
 
 param = SearchParam()
 dict = Dictionary()
-param.filterLang = 'de'
-param.woi = 'Häuser'
-#result = dict.findWords(param)
-#print(result)
+param.filterLang = 'ro'
+param.woi = 'teatre'
+result = dict.findWords(param)
+print(result)
 
-blob = TextBlob(param.woi)                        
-print(blob.detect_language())
+#blob = TextBlob(param.woi)                        
+#print(blob.detect_language())
