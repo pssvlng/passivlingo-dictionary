@@ -21,8 +21,8 @@ from textblob import TextBlob
 
 param = SearchParam()
 dict = Dictionary()
-param.filterLang = 'ro'
-param.woi = 'teatre'
+#param.filterLang = 'europe'
+param.woi = 'houses'
 result = dict.findWords(param)
 print(result)
 

@@ -1,7 +1,7 @@
 VALID_WORDNET_LANGS = ['als', 'arb', 'bul', 'cat', 'cmn', 'dan', 'ell', 'eng', 'eus', 'fas', 'fin', 'fra', 'glg', 'heb', 'hrv', 'ind', 'ita', 'jpn', 'nld', 'nno', 'nob', 'pol', 'por', 'qcn', 'slv', 'spa', 'swe', 'tha', 'zsm']
 VALID_EU_LANGS = ['eng', 'fra', 'spa', 'ita', 'nld', 'por', 'ger', 'deu']
 
-VALID_WORDNET_LANGS_OWN = ['af', 'als', 'arb', 'bg', 'ca', 'da', 'de', 'el', 'en', 'es', 'eu', 'fi', 'fr', 'gl', 'he', 'hr', 'id', 'is', 'it', 'jp', 'lt', 'nb', 'nl', 'pl', 'pt', 'ro', 'sk', 'sl', 'sv', 'th', 'zh', 'zsm']
+VALID_WORDNET_LANGS_OWN = ['af', 'als', 'arb', 'bg', 'ca', 'da', 'de', 'el', 'en', 'es', 'eu', 'fi', 'fr', 'gl', 'he', 'hr', 'id', 'is', 'it', 'jp', 'lt', 'nb', 'nl', 'pl', 'pt', 'ro', 'sk', 'sl', 'sv', 'th', 'ua', 'zh', 'zsm']
 VALID_EU_LANGS_OWN = ['en', 'fr', 'es', 'it', 'nl', 'pt', 'de']
 
 DOMAIN_NAMES = ['.co', '.de', '.nl', '.pt', '.es', '.org', '.net', '.fr', '.it', '.net', '.com', '.edu', '.gov']
@@ -45,7 +45,8 @@ OWN_TO_NLTK_LANGMAP_EXCLUSIONS = {
     'ro': 'ron',
     'sk': 'slk',
     'lt': 'lit',
-    'af': 'afr'
+    'af': 'afr',
+    'ua': 'ukr'
 } 
 
 NLTK_TO_OWN_LANGMAP = {
@@ -86,5 +87,6 @@ NLTK_TO_OWN_LANGMAP_EXCLUSIONS = {
     'ron': 'ro',
     'slk': 'sk',
     'lit': 'lt',
-    'afr': 'af'
+    'afr': 'af',
+    'ukr': 'ua'
 }
