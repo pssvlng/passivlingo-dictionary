@@ -20,15 +20,15 @@ from setuptools import find_packages, setup
 setup(
     name='passivlingo_dictionary',
     packages=find_packages(),            
-    version='1.0.0',
+    version='1.0.1',
     description='Python package for accessing OWN and NLTK wordnet ontologies',    
     url='https://github.com/pssvlng/passivlingo-dictionary',
     author='passivlingo',
     author_email='info@passivlingo.com',
     license='GPL 3',
-    install_requires=['wn==0.6.2', 'nltk==3.6.2', 'spacy==3.0.6', 'textblob==0.15.3', 'pyttsx3==2.90', 'gtts==2.2.2', 'playsound==1.2.2'],
+    install_requires=['wn', 'nltk', 'spacy', 'textblob', 'pyttsx3', 'gtts', 'playsound'],
     setup_requires=['pytest-runner'],
-    tests_require=['pytest==4.4.1'],
+    tests_require=['pytest'],
     test_suite='tests',
     classifiers = [
         'Intended Audience :: Developers',

@@ -29,8 +29,11 @@ class OwnSynsetWrapper:
         return self.__synset.lemmas()            
     def definition(self):
         return self.__synset.definition()            
-    def examples(self):
-        return self.__synset.examples()                    
+    def examples(self):        
+        result = self.__synset.examples()                    
+        for sense in self.__synset.senses():
+            result.extend(sense.examples())
+        return result
     def hypernyms(self):
         result = []
         for synset in self.__synset.hypernyms():

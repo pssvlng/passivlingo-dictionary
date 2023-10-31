@@ -1,8 +1,9 @@
 VALID_WORDNET_LANGS = ['als', 'arb', 'bul', 'cat', 'cmn', 'dan', 'ell', 'eng', 'eus', 'fas', 'fin', 'fra', 'glg', 'heb', 'hrv', 'ind', 'ita', 'jpn', 'nld', 'nno', 'nob', 'pol', 'por', 'qcn', 'slv', 'spa', 'swe', 'tha', 'zsm']
 VALID_EU_LANGS = ['eng', 'fra', 'spa', 'ita', 'nld', 'por', 'ger', 'deu']
 
-VALID_WORDNET_LANGS_OWN = ['af', 'als', 'arb', 'bg', 'ca', 'da', 'de', 'el', 'en', 'es', 'eu', 'fi', 'fr', 'gl', 'he', 'hr', 'id', 'is', 'it', 'jp', 'lt', 'nb', 'nl', 'pl', 'pt', 'ro', 'sk', 'sl', 'sv', 'th', 'ua', 'zh', 'zsm']
 VALID_EU_LANGS_OWN = ['en', 'fr', 'es', 'it', 'nl', 'pt', 'de']
+VALID_AFRICA_LANGS_OWN = ['am', 'bm', 'ny', 'dv', 'ee', 'gu', 'ha', 'ig', 'rw', 'kri', 'ln', 'lg', 'mg', 'om', 'nso', 'st', 'sn', 'so', 'sw', 'ti', 'ts', 'tw', 'xh', 'yo', 'zu']
+VALID_WORDNET_LANGS_OWN = ['af', 'als', 'arb', 'bg', 'ca', 'da', 'el', 'eu', 'fi', 'gl', 'he', 'hr', 'id', 'is', 'jp', 'lt', 'nb', 'pl', 'ro', 'sk', 'sl', 'sv', 'th', 'ua', 'zh', 'zsm'] + VALID_EU_LANGS_OWN + VALID_AFRICA_LANGS_OWN
 
 DOMAIN_NAMES = ['.co', '.de', '.nl', '.pt', '.es', '.org', '.net', '.fr', '.it', '.net', '.com', '.edu', '.gov']
 
