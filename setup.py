@@ -20,7 +20,7 @@ from setuptools import find_packages, setup
 setup(
     name='passivlingo_dictionary',
     packages=find_packages(),            
-    version='1.0.1',
+    version='1.0.2',
     description='Python package for accessing OWN and NLTK wordnet ontologies',    
     url='https://github.com/pssvlng/passivlingo-dictionary',
     author='passivlingo',

@@ -49,6 +49,13 @@ class OwnWordNetWrapper(WordNetWrapper):
 
         raise ValueError(f'Unknown POS: {pos}. Unable to find corresponding description')         
     
+    def __is_convertible_to_int(self, s):
+        try:
+            int(s)
+            return True
+        except ValueError:
+            return False
+    
     def getWordByPos(self, pSynsets, classifier, posDescription): 
         result = []
         for synset in pSynsets:            
@@ -58,9 +65,11 @@ class OwnWordNetWrapper(WordNetWrapper):
                 item.pos = posDescription                
                 item.definition = synset.definition()                
                 item.example = synset.examples()[0] if len(synset.examples()) > 0 else ''
-                item.offset = synset.id.split('-')[1]
+                offsetIndex = next((index for index, item in enumerate(synset.id.split('-')) if self.__is_convertible_to_int(item)), -1)                
+                item.offset = synset.id.split('-')[offsetIndex]                
                 item.ili = synset.ili
-                item.wordKey = '.'.join([synset.lemmas()[0], synset.pos, synset.id.split('-')[1], synset.id.split('-')[0]])
+                subKey = '.'.join(synset.id.split('-')[::-1])
+                item.wordKey = '.'.join([synset.lemmas()[0], subKey])                
                 item.linguisticCounter = self.getLinguisticCounter(synset)
                 #TODO: Deprecated - use only GenericLanguageDescriptions object in future
                 item.languageDescriptions = self.getLanguageDescriptions(synset)
@@ -75,12 +84,14 @@ class OwnWordNetWrapper(WordNetWrapper):
     def getWord(self, synset): 
         result = Word()
         result.name = synset.lemmas()[0].replace('_', ' ')
-        result.pos = self.getPOSDescription(synset.id.split('-')[2])       
+        result.pos = self.getPOSDescription(synset.id.split('-')[-1])       
         result.definition = synset.definition()                
         result.example = synset.examples()[0] if len(synset.examples()) > 0 else ''
-        result.offset = synset.id.split('-')[1]
+        offsetIndex = next((index for index, item in enumerate(synset.id.split('-')) if self.__is_convertible_to_int(item)), -1)                
+        result.offset = synset.id.split('-')[offsetIndex]
         result.ili = synset.ili
-        result.wordKey = '.'.join([synset.lemmas()[0], synset.pos, synset.id.split('-')[1], synset.id.split('-')[0]])
+        subKey = '.'.join(synset.id.split('-')[::-1])
+        result.wordKey = '.'.join([synset.lemmas()[0], subKey])
         result.linguisticCounter = self.getLinguisticCounter(synset)
         #TODO: Deprecated - use only GenericLanguageDescriptions object in future
         result.languageDescriptions = self.getLanguageDescriptions(synset)
@@ -250,11 +261,12 @@ class OwnWordNetWrapper(WordNetWrapper):
 
     def isValidWordKey(self, wordkey):
         wordkeyArr = wordkey.split('.')
-        return len(wordkeyArr) == 4
+        return len(wordkeyArr) > 3
 
-    def getWordKey(self, wordkey): 
-        wordkeyArr = wordkey.split('.')
-        return '-'.join([wordkeyArr[3], wordkeyArr[2], wordkeyArr[1]])
+    def getWordKey(self, wordkey):         
+        wordkeyArr = wordkey.split('.')[1:]
+        wordkeyArr.reverse()
+        return '-'.join(wordkeyArr)
 
     def getWordKeySynset(self, wordkey, lang):
         lang = self.getWordnetLanguageCode(lang)

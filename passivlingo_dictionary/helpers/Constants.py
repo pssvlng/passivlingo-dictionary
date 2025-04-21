@@ -3,7 +3,7 @@ VALID_EU_LANGS = ['eng', 'fra', 'spa', 'ita', 'nld', 'por', 'ger', 'deu']
 
 VALID_EU_LANGS_OWN = ['en', 'fr', 'es', 'it', 'nl', 'pt', 'de']
 VALID_AFRICA_LANGS_OWN = ['am', 'bm', 'ny', 'dv', 'ee', 'gu', 'ha', 'ig', 'rw', 'kri', 'ln', 'lg', 'mg', 'om', 'nso', 'st', 'sn', 'so', 'sw', 'ti', 'ts', 'tw', 'xh', 'yo', 'zu']
-VALID_WORDNET_LANGS_OWN = ['af', 'als', 'arb', 'bg', 'ca', 'da', 'el', 'eu', 'fi', 'gl', 'he', 'hr', 'id', 'is', 'jp', 'lt', 'nb', 'pl', 'ro', 'sk', 'sl', 'sv', 'th', 'ua', 'zh', 'zsm'] + VALID_EU_LANGS_OWN + VALID_AFRICA_LANGS_OWN
+VALID_WORDNET_LANGS_OWN = ['af', 'als', 'arb', 'bg', 'ca', 'da', 'el', 'eu', 'fi', 'gl', 'he', 'hr', 'id', 'is', 'jp', 'ja', 'lt', 'nb', 'pl', 'ro', 'sk', 'sl', 'sv', 'th', 'ua', 'zh', 'zsm'] + VALID_EU_LANGS_OWN + VALID_AFRICA_LANGS_OWN
 
 DOMAIN_NAMES = ['.co', '.de', '.nl', '.pt', '.es', '.org', '.net', '.fr', '.it', '.net', '.com', '.edu', '.gov']
 
@@ -28,6 +28,7 @@ OWN_TO_NLTK_LANGMAP = {
     'id': 'ind',     
     'it': 'ita', 
     'jp': 'jpn',     
+    'ja': 'jpn',
     'nb': 'nob', 
     'nl': 'nld', 
     'pl': 'pol', 
@@ -47,7 +48,12 @@ OWN_TO_NLTK_LANGMAP_EXCLUSIONS = {
     'sk': 'slk',
     'lt': 'lit',
     'af': 'afr',
-    'ua': 'ukr'
+    'ua': 'ukr',
+    'zu': 'zu',
+    'xh': 'xh',
+    'st': 'st',
+    'ts': 'ts',
+    'nso': 'nso',
 } 
 
 NLTK_TO_OWN_LANGMAP = {
@@ -67,7 +73,7 @@ NLTK_TO_OWN_LANGMAP = {
     'hrv': 'hr', 
     'ind': 'id', 
     'ita': 'it', 
-    'jpn': 'jp', 
+    'jpn': 'ja', 
     'nld': 'nl', 
     'nno': 'nb', 
     'nob': 'nb', 
@@ -89,5 +95,10 @@ NLTK_TO_OWN_LANGMAP_EXCLUSIONS = {
     'slk': 'sk',
     'lit': 'lt',
     'afr': 'af',
-    'ukr': 'ua'
+    'ukr': 'ua',
+    'zu': 'zu',
+    'xh': 'xh',
+    'st': 'st',
+    'ts': 'ts',
+    'nso': 'nso',
 }
