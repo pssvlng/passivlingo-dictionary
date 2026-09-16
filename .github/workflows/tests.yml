@@ -36,7 +36,7 @@ jobs:
           path: |
             ~/.wn_data
             ~/nltk_data
-          key: wndata-${{ runner.os }}-ewn2020-nltk2
+          key: wndata-${{ runner.os }}-ewn2020-hyde01-nltk3
 
       - name: Install package and test dependencies
         run: |
@@ -50,11 +50,36 @@ jobs:
         run: |
           python - <<'PY'
           import wn
-          # English WordNet is required by the English-language tests. The
-          # hybrid multilingual lexicons are not on the public project index,
-          # so multilingual tests skip themselves here (see tests/conftest.py).
+          # English WordNet backs the English-language tests.
           if 'ewn' not in {lex.id for lex in wn.lexicons()}:
               wn.download('ewn:2020')
+          PY
+
+          # The hybrid lexicons back the multilingual tests. They are not on
+          # the public `wn` project index, so fetch the WN-LMF resources
+          # directly. Without them those tests skip (see tests/conftest.py),
+          # so a failure here must not fail the job.
+          python - <<'PY' || true
+          import io, urllib.request, zipfile
+          import wn
+
+          BASE = ('https://github.com/pssvlng/open-european-wordnets-hybrid'
+                  '/raw/main/{}_hybrid.zip')
+          # The suite's fixtures span the six languages the library treats as
+          # its default set; installing fewer leaves tests failing rather than
+          # skipping, because `wn` raises for a language with no lexicon.
+          wanted = {'de': 'hyde', 'fr': 'hyfr', 'it': 'hyit',
+                    'es': 'hyes', 'nl': 'hynl', 'pt': 'hypt'}
+
+          installed = {lex.id for lex in wn.lexicons()}
+          for code, lexicon_id in wanted.items():
+              if lexicon_id in installed:
+                  continue
+              print(f'downloading {code}_hybrid...', flush=True)
+              with urllib.request.urlopen(BASE.format(code), timeout=600) as response:
+                  archive = zipfile.ZipFile(io.BytesIO(response.read()))
+              archive.extractall('/tmp/hybrid')
+              wn.add(f'/tmp/hybrid/{code}_hybrid.xml', progress_handler=None)
           PY
           # NLTK renamed several resources across releases: punkt -> punkt_tab,
           # averaged_perceptron_tagger -> ..._eng, omw-1.4 -> omw-2.0. Request

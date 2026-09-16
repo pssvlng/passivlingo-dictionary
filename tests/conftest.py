@@ -55,6 +55,37 @@ def skip_without_lexicon(lexicon_id: str):
     )
 
 
+#: The German hybrid lexicon stands in for multilingual availability
+#: generally: every multilingual fixture in the suite queries it.
+HAS_MULTILINGUAL = has_lexicon('hyde')
+
+#: Tests that assert on non-English wordnet content. Without a multilingual
+#: lexicon installed the underlying `wn` package raises rather than returning
+#: an empty result, so these are skipped wholesale instead of failing. The
+#: English-only tests in these modules are skipped too; separating them would
+#: mean annotating individual tests across six modules, and the English paths
+#: are covered by the modules that remain.
+_MULTILINGUAL_MODULES = frozenset({
+    'test_wrappers',
+    'test_search_chains',
+    'test_extractors',
+    'test_own_synset_wrapper',
+})
+
+
+def pytest_collection_modifyitems(config, items):
+    """Skip multilingual tests when no multilingual lexicon is installed."""
+    if HAS_MULTILINGUAL:
+        return
+    skip = pytest.mark.skip(
+        reason="no multilingual wordnet lexicon installed (e.g. 'hyde'); "
+               "install the hybrid lexicons to run the multilingual tests"
+    )
+    for item in items:
+        if item.module.__name__.split('.')[-1] in _MULTILINGUAL_MODULES:
+            item.add_marker(skip)
+
+
 @pytest.fixture
 def mock_translation_response(monkeypatch):
     """Patch urlopen so translation providers never make real network calls.
