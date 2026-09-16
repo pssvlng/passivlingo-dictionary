@@ -32,5 +32,3 @@ class WordKeySearchChain(SearchChain):
 
     def __repr__(self):
         return f'WordKeySearchChain({self.woi} {repr(self.wordNetWrapper)})'
-    def __str__(self):    
-        return f'WordKeySearchChain({self.woi} {repr(self.wordNetWrapper)})'    

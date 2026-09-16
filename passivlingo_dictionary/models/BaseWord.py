@@ -13,8 +13,6 @@ class BaseWord:
         self.lang = ''
         self.wordnetId = ''
         
-    def __str__(self):
-        return f'BaseWord({self.wordKey})'
 
     def __repr__(self):
         return f'BaseWord({self.wordKey})'

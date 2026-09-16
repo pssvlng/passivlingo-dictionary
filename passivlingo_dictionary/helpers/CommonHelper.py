@@ -21,34 +21,34 @@ class CommonHelper:
             variant = CommonHelper.getWordnetLanguageCode(filterLang, VALID_WORDNET_LANGS, langMap)
             result.append(variant)
             return result
-        except:
-            pass 
+        except Exception:
+            pass
 
         langMap = {}
         langMap.update(NLTK_TO_OWN_LANGMAP)
         langMap.update(NLTK_TO_OWN_LANGMAP_EXCLUSIONS)
         try:
-            variant = CommonHelper.getWordnetLanguageCode(filterLang, VALID_WORDNET_LANGS_OWN, langMap)   
+            variant = CommonHelper.getWordnetLanguageCode(filterLang, VALID_WORDNET_LANGS_OWN, langMap)
             result.append(variant)
             return result
-        except:
-            pass    
+        except Exception:
+            pass
 
         return result
 
     @classmethod
     def getWordnetLanguageCode(cls, lang, validLangs, langMap):
-        if lang == None:
+        if lang is None:
             return None
 
         if lang in validLangs:
             return lang
 
         result = langMap.get(lang)
-        if result != None:
-            return result        
+        if result is not None:
+            return result
 
-        raise ValueError(f"Invalid Language Code: '{lang}' is not a valid wordnet language code")                 
+        raise ValueError(f"Invalid Language Code: '{lang}' is not a valid wordnet language code")
 
     @classmethod
     def getCountryCode(cls, lang):
@@ -125,7 +125,7 @@ class CommonHelper:
             return 'x'
 
     @classmethod
-    def sanatizeWord(cls, woi):        
+    def sanitizeWord(cls, woi):
         result = unquote(woi)
         startsWithList = ["...", "'",'"', "n'", "l'", ",", ".", "!", "?", "¿", ";", "_", "-", "`", "~", "<", ">", "%", "$", "#", "*", "(", ")", "+", "|", "@", "&", "^", "«", "»"]
         endsWithList = ["...", "'",'"', "'s", ",", ".", "!", "?", "¿",";", "_", "-", "`", "~", "<", ">", "%", "$", "#", "*", "(", ")", "+", "|", "@", "&", "^", "«", "»"]
@@ -134,7 +134,10 @@ class CommonHelper:
                 result = result[len(s):]
         for e in endsWithList:
             if result.endswith(e):
-                result = result[:(len(e)*-1)]                
+                result = result[:(len(e)*-1)]
 
-        return result        
-    
+        return result
+
+    # Deprecated alias kept for backward compatibility; use sanitizeWord instead.
+    sanatizeWord = sanitizeWord
+

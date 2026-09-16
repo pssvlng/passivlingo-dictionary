@@ -174,14 +174,24 @@ class NltkWordNetWrapper(WordNetWrapper):
         
         return result
 
-    def getLanguageStr(self, pSynset, plang):    
+    def getLanguageStr(self, pSynset, plang):
         result = ''
         filterlist = ['GAP!', 'PSEUDOGAP!']
-        for lemma in pSynset.lemmas(lang=plang):
+        try:
+            lemmas = pSynset.lemmas(lang=plang)
+        except LookupError:
+            # NLTK serves non-English lemmas from its Open Multilingual
+            # Wordnet corpus, which is an optional download (and is named
+            # differently across NLTK releases: 'omw-1.4', 'omw-2.0'). When it
+            # is absent, this backend simply has no translations to offer, so
+            # report none rather than failing the whole lookup - English-only
+            # operation is a supported configuration.
+            return result
+        for lemma in lemmas:
             if lemma.name() not in filterlist:
                 result = result + lemma.name() + ','
         if len(result) > 0:
-            result = result[:-1]    
+            result = result[:-1]
 
         return result
 
@@ -239,6 +249,4 @@ class NltkWordNetWrapper(WordNetWrapper):
         return []    
 
     def __repr__(self):
-        return 'NltkWordNetWrapper()'
-    def __str__(self):    
         return 'NltkWordNetWrapper()'

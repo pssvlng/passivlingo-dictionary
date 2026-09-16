@@ -10,5 +10,3 @@ class HolonymExtractor(Extractor):
 
     def __repr__(self):
         return f'HolonymExtractor({repr(self.wordNetWrapper)})'
-    def __str__(self):    
-        return f'HolonymExtractor({repr(self.wordNetWrapper)})'                     

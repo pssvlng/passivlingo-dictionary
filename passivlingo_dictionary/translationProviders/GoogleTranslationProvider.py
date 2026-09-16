@@ -1,5 +1,4 @@
 from .TranslationProvider import TranslationProvider
-from passivlingo_dictionary.helpers.CommonHelper import CommonHelper
 from urllib.request import Request, urlopen
 import urllib.parse
 import json
@@ -24,6 +23,6 @@ class GoogleTranslationProvider(TranslationProvider):
                 result.append(tr['translatedText'])
             
             return ', '.join(result)
-        except Exception as err:            
+        except Exception as err:
             print("Google Api could not translate '%s' into target language '%s': %s" % (woi, targetLang, err))
-            return ''    
+            return ''

@@ -16,6 +16,4 @@ class DefaultSearchChain(SearchChain):
 
     def __repr__(self):
         return f'DefaultSearchChain({self.woi} {repr(self.wordNetWrapper)})'
-    def __str__(self):    
-        return f'DefaultSearchChain({self.woi} {repr(self.wordNetWrapper)})'                                             
         

@@ -37,5 +37,3 @@ class GenericLanguageDescriptions:
     def __repr__(self):
         return f'GenericLanguageDescriptions({len(self.langMap)})'
 
-    def __str__(self):        
-        return f'GenericLanguageDescriptions({len(self.langMap)})'    

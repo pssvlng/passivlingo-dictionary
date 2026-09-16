@@ -21,5 +21,3 @@ class LinguisticCounter:
 
     def __repr__(self):
         return 'LinguisticCounter()'
-    def __str__(self):        
-        return 'LinguisticCounter()'

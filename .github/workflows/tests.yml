@@ -1,0 +1,78 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.8', '3.10', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache wordnet and NLTK data
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.wn_data
+            ~/nltk_data
+          key: wndata-${{ runner.os }}-ewn2020-nltk1
+
+      - name: Install package and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[test]"
+
+      - name: Install spaCy English model
+        run: python -m spacy download en_core_web_sm
+
+      - name: Download wordnet data
+        run: |
+          python - <<'PY'
+          import wn
+          # English WordNet is required by the English-language tests. The
+          # hybrid multilingual lexicons are not on the public project index,
+          # so multilingual tests skip themselves here (see tests/conftest.py).
+          if 'ewn' not in {lex.id for lex in wn.lexicons()}:
+              wn.download('ewn:2020')
+          PY
+          python -m nltk.downloader wordnet omw-1.4 stopwords punkt averaged_perceptron_tagger
+
+      - name: Run tests
+        run: python -m pytest tests/ -v --tb=short
+
+      - name: Run doctests
+        run: |
+          python -m doctest passivlingo_dictionary/core.py -v | tail -1
+          python -m doctest passivlingo_dictionary/__init__.py -v | tail -1
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install package and docs dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[docs]"
+
+      - name: Build documentation
+        # -W turns warnings into errors, so a broken cross-reference or a
+        # malformed directive fails the build rather than shipping silently.
+        run: python -m sphinx -b html documentation documentation/_build/html -W

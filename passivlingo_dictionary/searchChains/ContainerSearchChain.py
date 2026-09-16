@@ -21,8 +21,6 @@ class ContainerSearchChain(SearchChain):
 
     def __repr__(self):
         return f'ContainerSearchChain({self.woi} {repr(self.wordNetWrapper)})'
-    def __str__(self):    
-        return f'ContainerSearchChain({self.woi} {repr(self.wordNetWrapper)})'                                         
 
         
         

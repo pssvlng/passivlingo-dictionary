@@ -38,6 +38,4 @@ class TextProcessor:
     
     def __repr__(self):
         return 'TextProcessor()'
-    def __str__(self):    
-        return 'TextProcessor()'
             

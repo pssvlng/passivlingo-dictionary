@@ -13,5 +13,3 @@ class AdjectiveExtractor(Extractor):
 
     def __repr__(self):
         return f'AdjectiveExtractor({repr(self.wordNetWrapper)})'
-    def __str__(self):    
-        return f'AdjectiveExtractor({repr(self.wordNetWrapper)})'    

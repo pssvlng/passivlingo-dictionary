@@ -15,6 +15,4 @@ class SearchParam:
         self.ili = None
 
     def __repr__(self):
-        return f'SearchParam({self.woi} {self.wordKey} {self.filterLang})'
-    def __str__(self):    
-        return f'SearchParam({self.woi} {self.wordKey} {self.filterLang})'
+        return f'SearchParam({self.woi} {self.wordkey} {self.filterLang})'

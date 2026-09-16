@@ -1,8 +1,6 @@
 from .SearchChain import SearchChain
-from passivlingo_dictionary.helpers.CommonHelper import CommonHelper
 from passivlingo_dictionary.helpers.FactoryMethods import FactoryMethods
 from passivlingo_dictionary.extractors.CombinedExtractor import CombinedExtractor
-from textblob import TextBlob
 
 class LemmaSearchChain(SearchChain):
 
@@ -25,7 +23,7 @@ class LemmaSearchChain(SearchChain):
             else:
                 combineResults(FactoryMethods.getLemmatizer(self.lang).lemmatize(self.woi), self.lang)                                                                
         
-        except:
+        except Exception:
             pass
 
         if len(result) > 0:
@@ -34,6 +32,4 @@ class LemmaSearchChain(SearchChain):
         return super().execute()
 
     def __repr__(self):
-        return f'LemmaSearchChain({self.woi} {repr(self.wordNetWrapper)})'
-    def __str__(self):    
         return f'LemmaSearchChain({self.woi} {repr(self.wordNetWrapper)})'

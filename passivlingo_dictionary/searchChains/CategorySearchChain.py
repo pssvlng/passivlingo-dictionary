@@ -30,5 +30,3 @@ class CategorySearchChain(SearchChain):
 
     def __repr__(self):
         return f'CategorySearchChain({self.category} {repr(self.wordNetWrapper)})'
-    def __str__(self):    
-        return f'CategorySearchChain({self.category} {repr(self.wordNetWrapper)})'                                         

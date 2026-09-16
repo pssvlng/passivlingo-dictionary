@@ -67,10 +67,12 @@ class SearchChainFactory:
                 return self.__getDefaultSearchChain(searchParam.woi, filterLangs, wordNetWrapper, translationProvider)
             elif self.__isCategorySearchChain(searchParam.lang, searchParam.category, searchParam.lemma, searchParam.pos):                
                 return self.__getCategorySearchChain(searchParam.woi, searchParam.lang, searchParam.category, filterLangs, wordNetWrapper, translationProvider)
-            elif self.__isPosSearchChain(searchParam.lang, searchParam.lemma, searchParam.pos, searchParam.category):                        
+            elif self.__isPosSearchChain(searchParam.lang, searchParam.lemma, searchParam.pos, searchParam.category):
                 return self.__getPosSearchChain(searchParam.woi, searchParam.lang, searchParam.lemma, searchParam.pos, filterLangs, wordNetWrapper, translationProvider)
             else:
-                raise ValueError('Invalid argument list, possible combinations: (woi), (wordkey, lang, category), (woi, lang, category), (woi, lang, pos, lemma)')                        
+                raise ValueError('Invalid argument list, possible combinations: (woi), (wordkey, lang, category), (woi, lang, category), (woi, lang, pos, lemma)')
+
+        raise ValueError("Invalid argument list: 'woi' or 'wordkey' or ('ili' and 'lang') required")
 
     def __getTranslationProvider(self, searchParam: SearchParam):
         if searchParam.googleApiKey:
@@ -136,7 +138,7 @@ class SearchChainFactory:
         return filterLang and all(x not in langVariants for x in wordNetLangs) and len(filterLang.split(',')) == 1        
 
     def __getMtSearchChain(self, woi, filterLang, wordNetWrapper, translationProvider) -> SearchChain:
-        woi = CommonHelper.sanatizeWord(woi)    
+        woi = CommonHelper.sanitizeWord(woi)    
         items = [MtSearchChain(translationProvider, woi, None, filterLang)]
         return  ContainerSearchChain(items, woi, None, wordNetWrapper)
 
@@ -144,7 +146,7 @@ class SearchChainFactory:
         return all(x is None for x in [category, lang, lemma, pos])
 
     def __getDefaultSearchChain(self, woi, filterLang, wordNetWrapper, translationProvider) -> SearchChain:
-        woi = CommonHelper.sanatizeWord(woi)    
+        woi = CommonHelper.sanitizeWord(woi)    
         items = [DefaultSearchChain(woi, None, wordNetWrapper), LemmaSearchChain(woi, None, wordNetWrapper, filterLang), MtSearchChain(translationProvider, woi, None, filterLang)]         
         return  ContainerSearchChain(items, woi, None, wordNetWrapper)
     
@@ -152,7 +154,7 @@ class SearchChainFactory:
         return all(x is not None for x in [lang, category]) and all(x is None for x in [lemma, pos])
 
     def __getCategorySearchChain(self, woi, lang, category, filterLang, wordNetWrapper, translationProvider) -> SearchChain:        
-        woi = CommonHelper.sanatizeWord(woi)
+        woi = CommonHelper.sanitizeWord(woi)
         items = [CategorySearchChain(category, woi, lang, wordNetWrapper), DefaultSearchChain(woi, lang, wordNetWrapper), LemmaSearchChain(woi, lang, wordNetWrapper), MtSearchChain(translationProvider, woi, lang, filterLang)]        
         return ContainerSearchChain(items, woi, lang, wordNetWrapper)
     
@@ -160,6 +162,6 @@ class SearchChainFactory:
         return all(x is not None for x in [lang, lemma, pos]) and category is None
 
     def __getPosSearchChain(self, woi, lang, lemma, pos, filterLang, wordNetWrapper, translationProvider) -> SearchChain:
-        woi = CommonHelper.sanatizeWord(woi)
+        woi = CommonHelper.sanitizeWord(woi)
         items = [PosSearchChain(pos, lemma, lang, wordNetWrapper), DefaultSearchChain(woi, lang, wordNetWrapper), MtSearchChain(translationProvider, woi, lang, filterLang)]        
         return ContainerSearchChain(items, woi, lang, wordNetWrapper)   

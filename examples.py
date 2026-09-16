@@ -50,6 +50,19 @@ def categorySearchHypernym():
     result2 = myDict.findWords(searchParam)
     print(result2)
 
+
+def categorySearchHypernym2():
+    #Step1: search for the initial word
+    myDict = Dictionary()        
+    searchParam = SearchParam()    
+    
+    searchParam.wordkey = 'fancy.n.05904666.ewn'
+    searchParam.category = 'hypernym'
+    searchParam.lang = 'en'    
+    searchParam.filterLang = 'en'
+    result2 = myDict.findWords(searchParam)
+    print(result2)
+
 def categorySearchEntailment():
     #Step1: search for the initial word
     myDict = Dictionary()        
@@ -120,14 +133,15 @@ def iliLookup():
     print(result2)
     print(myDict.getExampleSentences(result2[0].wordKey))
 
-basicWordSearch()
-basicWordSearchWithLanguageFilter()
-categorySearchHypernym()
-categorySearchEntailment()
-categorySearchAntonym()
-nltkOnlySearch()
-ownOnlySearch()
-iliLookup()
+# basicWordSearch()
+# basicWordSearchWithLanguageFilter()
+# categorySearchHypernym()
+# categorySearchEntailment()
+# categorySearchAntonym()
+# nltkOnlySearch()
+# ownOnlySearch()
+# iliLookup()
+categorySearchHypernym2()
 
 #===============================
 # Basic Text Processing Examples  
@@ -158,7 +172,7 @@ def simpleTextProcessing():
     result2 = myDict.findWords(searchParam)
     print(result2)
 
-simpleTextProcessing()
+#simpleTextProcessing()
 
 #==========
 # Wrappers  

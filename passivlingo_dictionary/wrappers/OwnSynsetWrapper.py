@@ -10,11 +10,11 @@ class OwnSynsetWrapper:
     @property
     def ili(self):
         try:
-            if self.__synset.ili:            
+            if self.__synset.ili:
                 return self.__synset.ili.id
-        except:
+        except Exception:
             return ''
-            
+
         return ''
     @property
     def pos(self):
@@ -61,6 +61,4 @@ class OwnSynsetWrapper:
         return result        
 
     def __repr__(self):
-        return f'OwnSynsetWrapper({self.id})'
-    def __str__(self):        
         return f'OwnSynsetWrapper({self.id})'

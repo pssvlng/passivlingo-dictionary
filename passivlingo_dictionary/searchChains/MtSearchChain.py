@@ -31,8 +31,8 @@ class MtSearchChain(SearchChain):
         for item in langList:
             try:
                 item = CommonHelper.getWordnetLanguageCode(item, VALID_WORDNET_LANGS_OWN, langMap)
-            except:
-                pass    
+            except Exception:
+                pass
         langList = list(set(langList))    
 
         for lang in langList:
@@ -49,6 +49,4 @@ class MtSearchChain(SearchChain):
         return [result]
 
     def __repr__(self):
-        return f'MtSearchChain({self.woi})'
-    def __str__(self):    
         return f'MtSearchChain({self.woi})'

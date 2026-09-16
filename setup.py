@@ -1,9 +1,9 @@
-""" Passivlingo Multilingual Dictionary 
+""" Passivlingo Multilingual Dictionary
 Copyright (C) Passivlingo (www.passivlingo.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or 
+    the Free Software Foundation, either version 3 of the License, or
     any later version.
 
     This program is distributed in the hope that it will be useful,
@@ -15,29 +15,68 @@ Copyright (C) Passivlingo (www.passivlingo.com)
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  """
 
+import re
+from pathlib import Path
+
 from setuptools import find_packages, setup
+
+HERE = Path(__file__).parent
+
+LONG_DESCRIPTION = HERE.joinpath('README.md').read_text(encoding='utf-8')
+
+# Single source of truth for the version: read it from the package rather
+# than duplicating it here, where the two would drift apart.
+VERSION = re.search(
+    r"^__version__ = ['\"]([^'\"]+)['\"]",
+    HERE.joinpath('passivlingo_dictionary', '__init__.py').read_text(encoding='utf-8'),
+    re.M,
+).group(1)
 
 setup(
     name='passivlingo_dictionary',
-    packages=find_packages(),            
-    version='1.0.2',
-    description='Python package for accessing OWN and NLTK wordnet ontologies',    
+    packages=find_packages(exclude=['tests', 'tests.*']),
+    version=VERSION,
+    description=(
+        'Unified multilingual WordNet access across the wn (OMW) and NLTK '
+        'backends, with cross-lingual lookup and retrieval-step provenance'
+    ),
+    long_description=LONG_DESCRIPTION,
+    long_description_content_type='text/markdown',
     url='https://github.com/pssvlng/passivlingo-dictionary',
     author='passivlingo',
     author_email='info@passivlingo.com',
     license='GPL 3',
-    install_requires=['wn', 'nltk', 'spacy', 'textblob', 'pyttsx3', 'gtts', 'playsound'],
-    setup_requires=['pytest-runner'],
-    tests_require=['pytest'],
-    test_suite='tests',
-    classifiers = [
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Libraries :: Python Modules',
-        'Programming Language :: Python :: 3',
+    python_requires='>=3.8',
+    # Runtime dependencies of the library itself. spaCy is included because
+    # the tokenizer/lemmatizer factories import it at module load; textblob,
+    # gtts, pyttsx3 and playsound back optional features and are extras.
+    install_requires=[
+        'wn>=0.9,<0.10',
+        'nltk>=3.6',
+        'spacy>=3.0',
     ],
-    include_package_data=True
-)    
-
-        
-
-
+    extras_require={
+        # TextBlob-backed machine-translation provider.
+        'translate': ['textblob>=0.15'],
+        # Text-to-speech / audio helpers under Wrappers/.
+        'audio': ['gtts', 'pyttsx3', 'playsound'],
+        'test': ['pytest>=7'],
+        'docs': ['sphinx>=7,<9', 'sphinx-rtd-theme>=2,<4'],
+    },
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Text Processing :: Linguistic',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+    ],
+    include_package_data=True,
+)

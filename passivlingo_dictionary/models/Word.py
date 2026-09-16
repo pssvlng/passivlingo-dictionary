@@ -13,5 +13,3 @@ class Word(BaseWord):
     def __repr__(self):
         return f'Word({self.wordKey})'
 
-    def __str__(self):        
-        return f'Word({self.wordKey})'    

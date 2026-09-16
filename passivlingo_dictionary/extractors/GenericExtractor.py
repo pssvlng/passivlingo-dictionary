@@ -7,10 +7,10 @@ class GenericExtractor(Extractor):
         self.extractList = pExtractList
 
     def extract(self, pSynsets):
+        result = []
         for r in self.extractList:
-            r.extract(pSynsets)
+            result.extend(r.extract(pSynsets))
+        return result
 
     def __repr__(self):
         return f'GenericExtractor({repr(self.wordNetWrapper)})'
-    def __str__(self):    
-        return f'GenericExtractor({repr(self.wordNetWrapper)})'              

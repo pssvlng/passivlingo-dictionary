@@ -297,7 +297,5 @@ class OwnWordNetWrapper(WordNetWrapper):
 
     def __repr__(self):
         return 'OwnWordNetWrapper()'
-    def __str__(self):    
-        return 'OwnWordNetWrapper()'
         
     

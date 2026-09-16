@@ -1,7 +1,6 @@
 from .TranslationProvider import TranslationProvider
 from urllib.parse import quote
 from urllib.request import Request, urlopen
-from passivlingo_dictionary.helpers.CommonHelper import CommonHelper
 import json
 
 class MyMemTranslationProvider(TranslationProvider):

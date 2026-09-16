@@ -10,5 +10,3 @@ class AntonymExtractor(Extractor):
 
     def __repr__(self):
         return f'AntonymExtractor({repr(self.wordNetWrapper)})'
-    def __str__(self):    
-        return f'AntonymExtractor({repr(self.wordNetWrapper)})'        
