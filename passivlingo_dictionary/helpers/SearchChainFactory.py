@@ -9,7 +9,9 @@ from passivlingo_dictionary.searchChains.IliSearchChain import IliSearchChain
 from passivlingo_dictionary.searchChains.SearchChain import SearchChain
 from passivlingo_dictionary.translationProviders.EmptyTranslationProvider import EmptyTranslationProvider
 from passivlingo_dictionary.translationProviders.GoogleTranslationProvider import GoogleTranslationProvider
-from passivlingo_dictionary.translationProviders.TextBlobTranslationProvider import TextBlobTranslationProvider 
+# TextBlobTranslationProvider is deliberately not imported here: it is never
+# instantiated by this factory, and importing it would make `textblob` — an
+# optional extra — a hard requirement of the core import path.
 from passivlingo_dictionary.helpers.CommonHelper import CommonHelper
 from passivlingo_dictionary.helpers.Constants import VALID_WORDNET_LANGS
 from passivlingo_dictionary.helpers.Constants import VALID_WORDNET_LANGS_OWN

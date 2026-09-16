@@ -46,7 +46,9 @@ setup(
     author='passivlingo',
     author_email='info@passivlingo.com',
     license='GPL 3',
-    python_requires='>=3.8',
+    # spaCy, a hard dependency, requires >=3.9; its build chain needs a numpy
+    # with no wheels for 3.8, so 3.8 cannot be supported while spaCy is core.
+    python_requires='>=3.9',
     # Runtime dependencies of the library itself. spaCy is included because
     # the tokenizer/lemmatizer factories import it at module load; textblob,
     # gtts, pyttsx3 and playsound back optional features and are extras.
@@ -72,7 +74,6 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Text Processing :: Linguistic',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',

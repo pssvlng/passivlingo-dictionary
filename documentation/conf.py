@@ -30,7 +30,10 @@ extensions = [
     'sphinx.ext.autosectionlabel',
 ]
 
-templates_path = ['_templates']
+# No custom templates or static assets yet. Both settings are intentionally
+# empty: naming directories that do not exist makes Sphinx warn, which fails
+# the documentation build under -W.
+templates_path = []
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # Autodoc: only document what modules declare in __all__, and preserve the
@@ -70,7 +73,7 @@ from passivlingo_dictionary import (
 # -- Options for HTML output -----------------------------------------------
 
 html_theme = 'sphinx_rtd_theme'
-html_static_path = ['_static']
+html_static_path = []
 html_theme_options = {
     'collapse_navigation': False,
     'navigation_depth': 3,

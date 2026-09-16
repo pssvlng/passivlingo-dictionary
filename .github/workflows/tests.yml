@@ -12,7 +12,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.8', '3.10', '3.12']
+        # 3.9 is the floor (spaCy requires >=3.9); 3.12 the ceiling; 3.10
+        # matches the development environment.
+        python-version: ['3.9', '3.10', '3.12']
 
     steps:
       - uses: actions/checkout@v4
@@ -22,13 +24,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      # The `wn` package does not create its data directory, and opening its
+      # SQLite database in a missing directory fails. Create both paths before
+      # the cache step so a cache miss cannot leave them absent.
+      - name: Prepare data directories
+        run: mkdir -p ~/.wn_data ~/nltk_data
+
       - name: Cache wordnet and NLTK data
         uses: actions/cache@v4
         with:
           path: |
             ~/.wn_data
             ~/nltk_data
-          key: wndata-${{ runner.os }}-ewn2020-nltk1
+          key: wndata-${{ runner.os }}-ewn2020-nltk2
 
       - name: Install package and test dependencies
         run: |
@@ -48,7 +56,12 @@ jobs:
           if 'ewn' not in {lex.id for lex in wn.lexicons()}:
               wn.download('ewn:2020')
           PY
-          python -m nltk.downloader wordnet omw-1.4 stopwords punkt averaged_perceptron_tagger
+          # NLTK renamed its Open Multilingual Wordnet corpus between releases
+          # (omw-1.4 -> omw-2.0). Try both; the library degrades gracefully if
+          # neither is present, so a failure here must not fail the job.
+          python -m nltk.downloader wordnet stopwords punkt averaged_perceptron_tagger
+          python -m nltk.downloader omw-1.4 || true
+          python -m nltk.downloader omw-2.0 || true
 
       - name: Run tests
         run: python -m pytest tests/ -v --tb=short
