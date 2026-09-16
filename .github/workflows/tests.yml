@@ -12,9 +12,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 3.9 is the floor (spaCy requires >=3.9); 3.12 the ceiling; 3.10
-        # matches the development environment.
-        python-version: ['3.9', '3.10', '3.12']
+        # 3.10 is the floor (nltk and wn both require >=3.10) and matches the
+        # development environment; 3.12 is the ceiling.
+        python-version: ['3.10', '3.12']
 
     steps:
       - uses: actions/checkout@v4
@@ -56,12 +56,16 @@ jobs:
           if 'ewn' not in {lex.id for lex in wn.lexicons()}:
               wn.download('ewn:2020')
           PY
-          # NLTK renamed its Open Multilingual Wordnet corpus between releases
-          # (omw-1.4 -> omw-2.0). Try both; the library degrades gracefully if
-          # neither is present, so a failure here must not fail the job.
-          python -m nltk.downloader wordnet stopwords punkt averaged_perceptron_tagger
-          python -m nltk.downloader omw-1.4 || true
-          python -m nltk.downloader omw-2.0 || true
+          # NLTK renamed several resources across releases: punkt -> punkt_tab,
+          # averaged_perceptron_tagger -> ..._eng, omw-1.4 -> omw-2.0. Request
+          # both spellings of each; `|| true` because a name absent from the
+          # installed NLTK version is expected, not an error.
+          python -m nltk.downloader wordnet stopwords
+          for resource in punkt punkt_tab \
+                          averaged_perceptron_tagger averaged_perceptron_tagger_eng \
+                          omw-1.4 omw-2.0; do
+            python -m nltk.downloader "$resource" || true
+          done
 
       - name: Run tests
         run: python -m pytest tests/ -v --tb=short

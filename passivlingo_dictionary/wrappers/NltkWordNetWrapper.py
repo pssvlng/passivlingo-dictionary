@@ -202,24 +202,39 @@ class NltkWordNetWrapper(WordNetWrapper):
 
         if lang not in VALID_WORDNET_LANGS:
             return []
-        woi = wn.synsets(woi, lang=lang, pos=posToken)
-        return woi
+        return self.__synsets(woi, lang, pos=posToken)
 
     def translate(self, woi, lang = None):
         woi = woi.replace(" ", "_")
 
-        result = []        
+        result = []
         if lang == None:
             for l in self.filterLang:
-                result = result + wn.synsets(woi, lang=l)
+                result = result + self.__synsets(woi, l)
 
         if len(result) > 0:
             return result
 
         if lang not in VALID_WORDNET_LANGS:
             return []
-    
-        return wn.synsets(woi, lang=lang)
+
+        return self.__synsets(woi, lang)
+
+    def __synsets(self, woi, lang, pos=None):
+        """Look up synsets for a language, tolerating a missing OMW corpus.
+
+        Non-English lookups read NLTK's Open Multilingual Wordnet corpus,
+        which is an optional download and is named differently across NLTK
+        releases ('omw-1.4', 'omw-2.0'). When it is absent there are simply no
+        synsets to return for that language, so report none rather than
+        failing the whole query - English-only operation is supported.
+        """
+        try:
+            if pos is None:
+                return wn.synsets(woi, lang=lang)
+            return wn.synsets(woi, lang=lang, pos=pos)
+        except LookupError:
+            return []
 
     def isValidWordKey(self, wordkey):
         wordkeyArr = wordkey.split('.')

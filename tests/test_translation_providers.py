@@ -11,7 +11,24 @@ import pytest
 from passivlingo_dictionary.translationProviders.EmptyTranslationProvider import EmptyTranslationProvider
 from passivlingo_dictionary.translationProviders.GoogleTranslationProvider import GoogleTranslationProvider
 from passivlingo_dictionary.translationProviders.MyMemTranslationProvider import MyMemTranslationProvider
-from passivlingo_dictionary.translationProviders.TextBlobTranslationProvider import TextBlobTranslationProvider
+
+# TextBlobTranslationProvider imports `textblob`, an optional extra installed
+# via `pip install passivlingo-dictionary[translate]`. Guard the import so the
+# providers that need no extras are still exercised when it is absent; only
+# the TextBlob tests are skipped.
+try:
+    from passivlingo_dictionary.translationProviders.TextBlobTranslationProvider import (
+        TextBlobTranslationProvider,
+    )
+    HAS_TEXTBLOB = True
+except ImportError:  # pragma: no cover - depends on the installed extras
+    TextBlobTranslationProvider = None
+    HAS_TEXTBLOB = False
+
+requires_textblob = pytest.mark.skipif(
+    not HAS_TEXTBLOB,
+    reason="the 'translate' extra (textblob) is not installed",
+)
 
 
 class TestEmptyTranslationProvider:
@@ -127,6 +144,7 @@ class TestMyMemTranslationProvider:
             provider.translate('en', 'de', 'house')
 
 
+@requires_textblob
 class TestTextBlobTranslationProvider:
     @patch('passivlingo_dictionary.translationProviders.TextBlobTranslationProvider.TextBlob')
     def test_translate_returns_translated_text(self, mock_textblob_cls):
