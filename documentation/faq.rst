@@ -40,6 +40,42 @@ want one sense, disambiguate first by inspecting
 :meth:`~passivlingo_dictionary.core.Synset.definition` or
 :meth:`~passivlingo_dictionary.core.Synset.pos`.
 
+What is the difference between ``lemmas()``, ``descriptions()`` and ``definitions()``?
+-----------------------------------------------------------------------------------------
+
+:meth:`~passivlingo_dictionary.core.Synset.lemmas` returns the word forms of
+*this* synset, in its own language. It takes no arguments and returns the same
+value as ``wn``'s method of the same name:
+
+.. doctest::
+
+    >>> import wn, passivlingo_dictionary as pld
+    >>> wn.synsets("happy", lexicon="ewn", pos="a")[0].lemmas()
+    ['happy']
+    >>> pld.Wordnet().synsets("happy", pos="a")[0].lemmas()
+    ['happy']
+
+This parity is deliberate, and it is why the multilingual variants are
+separate methods rather than arguments to ``lemmas()``. Giving ``lemmas()`` a
+``lang`` parameter that returned a per-language mapping would change its
+return type and break every caller ported from ``wn`` — including the
+migration path described in :doc:`guides/wn-migration`.
+
+The other two reach across languages through the Interlingual Index:
+
+- :meth:`~passivlingo_dictionary.core.Synset.descriptions` returns the word
+  forms per language — the multilingual counterpart of ``lemmas()``.
+- :meth:`~passivlingo_dictionary.core.Synset.definitions` returns the gloss
+  per language — the multilingual counterpart of ``definition()``.
+
+The naming is historical: ``descriptions()`` predates the current interface
+and returns lemmas despite its name. It is kept for compatibility with
+existing code.
+
+Both cross-lingual methods include the synset's own language, so a result
+covers every language you asked for. ``descriptions()[synset.lang]`` equals
+``lemmas()``, and ``definitions()[synset.lang]`` equals ``definition()``.
+
 Does :meth:`Synset.translate` require an internet connection?
 ------------------------------------------------------------------
 

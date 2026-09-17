@@ -39,6 +39,7 @@ Getting started
 
    setup
    faq
+   changelog
 
 Guides
 ------

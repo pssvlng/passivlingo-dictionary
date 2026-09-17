@@ -51,8 +51,24 @@ happy = wordnet.synsets("happy", pos="a")[0]
 [s.lemmas()[0] for s in happy.translate(lang="it")]
 # ['felice']
 
+# Word forms per language
 happy.descriptions()
 # {'de': ['glücklich'], 'fr': ['heureux'], 'it': ['felice'], ...}
+
+# Definitions per language
+happy.definitions()
+# {'en': 'enjoying or showing or marked by joy or pleasure',
+#  'de': 'sich freuen oder Freude zeigen oder von Freude oder Vergnügen geprägt sein',
+#  'fr': 'qui jouit ou montre ou est marqué par la joie ou le plaisir.', ...}
+```
+
+All three take `lang` the same way — a single code, a space- or
+comma-separated string, or a list — so you can narrow to a subset:
+
+```python
+happy.translate(lang="de fr")      # list[Synset], one per language
+happy.descriptions(lang=["de"])    # {'de': ['glücklich']}
+happy.definitions(lang="de fr")    # {'de': '...', 'fr': '...'}
 ```
 
 Cross-lingual operations require the `omw` backend and the target language's

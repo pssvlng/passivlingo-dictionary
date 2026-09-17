@@ -82,3 +82,7 @@ html_theme_options = {
 # -- Autosection label options ---------------------------------------------
 
 autosectionlabel_prefix_document = True
+
+# Only label top-level sections. The changelog repeats "Added"/"Changed"/
+# "Fixed" under each version, which would otherwise collide.
+autosectionlabel_maxdepth = 1

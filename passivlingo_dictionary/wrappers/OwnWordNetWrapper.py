@@ -20,8 +20,12 @@ class OwnWordNetWrapper(WordNetWrapper):
         if filterLang:
             self.filterLang = ['en']
             for lang in filterLang.split(','):
-                self.filterLang.append(self.getWordnetLanguageCode(lang))
-            self.filterLang = list(set(self.filterLang))    
+                code = self.getWordnetLanguageCode(lang)
+                # Deduplicate while preserving the caller's order: building
+                # this through a set leaves the order unspecified, which
+                # surfaces downstream wherever the list is iterated.
+                if code not in self.filterLang:
+                    self.filterLang.append(code)
         else:
             self.filterLang = copy.deepcopy(VALID_EU_LANGS_OWN)    
             
@@ -289,11 +293,20 @@ class OwnWordNetWrapper(WordNetWrapper):
         return result    
     
     def getSynsetsFromIli(self, ili, lang):
-        result = []        
-        for synset in wn.synsets(ili=ili, lang=lang):            
-            result.append(OwnSynsetWrapper(lang, synset))
+        result = []
+        for synset in wn.synsets(ili=ili, lang=lang):
+            # Label each synset with its own language rather than the language
+            # that was requested. `lang` is None when translations in every
+            # configured language were asked for, and storing that would leave
+            # every result reporting no language at all. The language is
+            # carried by the owning lexicon.
+            try:
+                synset_lang = synset.lexicon().language or lang
+            except (AttributeError, wn.Error):
+                synset_lang = lang
+            result.append(OwnSynsetWrapper(synset_lang, synset))
 
-        return result    
+        return result
 
     def __repr__(self):
         return 'OwnWordNetWrapper()'

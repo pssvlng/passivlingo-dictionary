@@ -232,6 +232,41 @@ class Synset:
         raw_def = self._raw.definition()
         return raw_def if raw_def else None
 
+    @_wrap_language_errors
+    def definitions(
+        self, lang: Union[str, Sequence[str], None] = None
+    ) -> Dict[str, str]:
+        """Return this synset's definition in each language, keyed by language
+        code.
+
+        Where :meth:`definition` gives the gloss in the synset's own language,
+        this resolves the synset across languages through its Interlingual
+        Index and collects each one's gloss.
+
+        Arguments:
+            lang: restrict the result to one or more languages, given the same
+                way as to :class:`Wordnet` — a single code (``'de'``), a
+                space- or comma-separated string (``'de fr'``), or a list of
+                codes. If omitted, returns every language configured on the
+                owning :class:`Wordnet`.
+
+        The synset's own language is included when it falls within the
+        requested set. Languages whose counterpart carries no gloss are
+        omitted, and the result is empty on a backend without an ILI.
+
+        Example:
+
+            >>> synset = Wordnet(lang="de fr").synsets("happy", pos="a")[0]
+            >>> synset.definitions(lang="de")
+            {'de': 'sich freuen oder Freude zeigen oder von Freude oder Vergnügen geprägt sein'}
+        """
+        result = {}
+        for translated in self.translate(lang=lang):
+            definition = translated.definition()
+            if translated.lang and definition:
+                result[translated.lang] = definition
+        return result
+
     def examples(self) -> List[str]:
         """Return example sentences using this synset's words."""
         return [ex.replace('"', '') for ex in self._raw.examples()]
@@ -331,38 +366,79 @@ class Synset:
         return {name: self._relation(name) for name in selected}
 
     @_wrap_language_errors
-    def translate(self, lang: Optional[str] = None) -> List['Synset']:
+    def translate(
+        self, lang: Union[str, Sequence[str], None] = None
+    ) -> List['Synset']:
         """Return the synsets in other languages that share this synset's
         Interlingual Index (ILI), i.e. the same concept expressed in
         other languages.
 
         Arguments:
-            lang: restrict results to this language; if omitted, returns
-                translations in every language configured on the owning
-                :class:`Wordnet`.
+            lang: restrict results to one or more languages, given the same
+                way as to :class:`Wordnet` — a single code (``'de'``), a
+                space- or comma-separated string (``'de fr'``), or a list of
+                codes. If omitted, returns translations in every language
+                configured on the owning :class:`Wordnet`.
+
+        Each language yields at most one synset, since the ILI identifies one
+        concept per lexicon, so a single-language request returns a list of
+        one. Languages with no counterpart are omitted rather than yielding a
+        placeholder, and the list is empty on a backend without an ILI.
+
+        The result includes this synset itself, under its own language: the
+        operation resolves an ILI across lexicons, and the source lexicon is
+        one of them. This follows :mod:`wn`, whose ``translate()`` behaves the
+        same way. Filter on :attr:`lang` to exclude it::
+
+            others = [s for s in synset.translate() if s.lang != synset.lang]
 
         Example:
 
-            >>> es = Wordnet(backend="omw").synsets("happy", pos="a")[0]
-            >>> [s.lemmas()[0] for s in es.translate(lang="it")]
+            >>> synset = Wordnet(backend="omw").synsets("happy", pos="a")[0]
+            >>> [s.lemmas()[0] for s in synset.translate(lang="it")]
             ['felice']
+            >>> sorted(s.lang for s in synset.translate(lang="de fr"))
+            ['de', 'fr']
         """
         if not self.ili:
             return []
-        resolved_lang = self._wrapper.getWordnetLanguageCode(lang) if lang else lang
-        raw_synsets = self._wrapper.getSynsetsFromIli(self.ili, resolved_lang)
-        return [Synset(self._wrapper, raw) for raw in raw_synsets]
+
+        normalized = _normalize_lang(lang)
+        if normalized is None:
+            # Default to the languages the owning Wordnet was configured with,
+            # as descriptions() does. Passing None to the backend would instead
+            # return every installed lexicon, ignoring that configuration.
+            normalized = ','.join(self._wrapper.filterLang)
+
+        results = []
+        for code in normalized.split(','):
+            resolved = self._wrapper.getWordnetLanguageCode(code)
+            results.extend(
+                Synset(self._wrapper, raw)
+                for raw in self._wrapper.getSynsetsFromIli(self.ili, resolved)
+            )
+        return results
 
     @_wrap_language_errors
     def descriptions(
         self, lang: Union[str, Sequence[str], None] = None
     ) -> Dict[str, List[str]]:
-        """Return this synset's word forms in every configured language.
+        """Return this synset's word forms in each language, keyed by language
+        code.
+
+        Where :meth:`lemmas` gives the forms in the synset's own language,
+        this resolves the synset across languages through its Interlingual
+        Index and collects each one's forms.
 
         Arguments:
-            lang: restrict the result to this language (or these
-                languages); if omitted, returns every language the owning
+            lang: restrict the result to one or more languages, given the same
+                way as to :class:`Wordnet` — a single code (``'de'``), a
+                space- or comma-separated string (``'de fr'``), or a list of
+                codes. If omitted, returns every language the owning
                 :class:`Wordnet` was configured with.
+
+        The synset's own language is included when it falls within the
+        requested set, and its entry equals :meth:`lemmas`.
 
         Example:
 
@@ -381,15 +457,24 @@ class Synset:
         else:
             requested_codes = list(lang)
 
+        own_language = self.lang
+
         result = {}
         for code in requested_codes:
             description = generic.getWordDescription(code)
             # Canonicalize through the same langMap getWordDescription used,
             # so e.g. 'deu' and 'de' land under the same result key.
             resolved_code = code if code in generic.descriptionLookup else generic.langMap.get(code, code)
-            result[resolved_code] = (
-                [w.strip() for w in description.split(',')] if description else []
-            )
+            if resolved_code == own_language:
+                # The underlying wrapper omits the synset's own language,
+                # since the legacy interface treated these as translations.
+                # Supply it from the synset itself so that this method covers
+                # every requested language, as definitions() does.
+                result[resolved_code] = self.lemmas()
+            else:
+                result[resolved_code] = (
+                    [w.strip() for w in description.split(',')] if description else []
+                )
         return result
 
     def relation_counts(self) -> RelationCounts:
@@ -461,7 +546,9 @@ class Sense:
         return [ex.replace('"', '') for ex in self._raw.examples()]
 
     @_wrap_language_errors
-    def translate(self, lang: Optional[str] = None) -> List['Sense']:
+    def translate(
+        self, lang: Union[str, Sequence[str], None] = None
+    ) -> List['Sense']:
         """Return corresponding senses in another language, via the
         parent synset's Interlingual Index."""
         return [
@@ -548,7 +635,9 @@ class Word:
         return [s for s in self._synset.senses() if s.word().lemma() == self._lemma]
 
     @_wrap_language_errors
-    def translate(self, lang: Optional[str] = None) -> Dict[Sense, List['Word']]:
+    def translate(
+        self, lang: Union[str, Sequence[str], None] = None
+    ) -> Dict[Sense, List['Word']]:
         """Return a mapping of this word's senses to translated words.
 
         Example:

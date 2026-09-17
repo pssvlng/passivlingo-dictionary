@@ -223,6 +223,88 @@ class TestSynsetRelations:
 
 @skip_without_lexicon('hyde')
 class TestSynsetTranslate:
+    def test_translate_without_lang_labels_each_result_with_its_own_language(self):
+        """Regression: translate() with no argument passed the requested
+        language (None) through to every result, so each translated synset
+        reported lang=None. The language is now taken from each synset's own
+        lexicon, which is what makes {synset.lang: synset.definition()}
+        mappings across languages possible."""
+        wordnet = Wordnet(lang='de fr it')
+        synset = wordnet.synsets('happy', pos='a')[0]
+
+        translated = synset.translate()
+        assert translated, 'expected translations for a synset with an ILI'
+        assert all(t.lang for t in translated), 'every result must report a language'
+
+        languages = {t.lang for t in translated}
+        assert {'de', 'fr', 'it'} <= languages
+
+    def test_translate_without_lang_yields_per_language_definitions(self):
+        wordnet = Wordnet(lang='de fr')
+        synset = wordnet.synsets('happy', pos='a')[0]
+
+        definitions = {t.lang: t.definition() for t in synset.translate()}
+        assert definitions['de'] != definitions['en']
+        assert definitions['fr'] != definitions['en']
+
+    @pytest.mark.parametrize('lang', ['de fr', 'de,fr', ['de', 'fr']])
+    def test_translate_accepts_multiple_languages(self, lang):
+        """translate() takes languages the same way Wordnet(lang=...) and
+        descriptions(lang=...) do: one code, a space- or comma-separated
+        string, or a list."""
+        wordnet = Wordnet(lang='de fr it')
+        synset = wordnet.synsets('happy', pos='a')[0]
+        assert sorted(t.lang for t in synset.translate(lang=lang)) == ['de', 'fr']
+
+    def test_translate_single_language_returns_one_synset(self):
+        # The ILI identifies one concept per lexicon, so a single-language
+        # request yields exactly one synset.
+        wordnet = Wordnet(lang='de fr')
+        synset = wordnet.synsets('happy', pos='a')[0]
+        assert len(synset.translate(lang='de')) == 1
+
+    def test_sense_translate_accepts_multiple_languages(self):
+        wordnet = Wordnet(lang='de fr')
+        sense = wordnet.synsets('happy', pos='a')[0].senses()[0]
+        languages = {s.synset().lang for s in sense.translate(lang='de fr')}
+        assert languages == {'de', 'fr'}
+
+    def test_word_translate_accepts_multiple_languages(self):
+        wordnet = Wordnet(lang='de fr')
+        word = wordnet.words('happy', pos='a')[0]
+        lemmas = {
+            lemma
+            for words in word.translate(lang='de fr').values()
+            for lemma in (w.lemma() for w in words)
+        }
+        assert {'glücklich', 'heureux'} <= lemmas
+
+    def test_result_includes_the_source_synset(self):
+        """translate() resolves an ILI across lexicons, and the source lexicon
+        is one of them, so the synset itself appears under its own language.
+        This matches wn's behaviour and is pinned here because it is
+        surprising enough to be 'fixed' by mistake."""
+        wordnet = Wordnet(lang='de fr')
+        synset = wordnet.synsets('happy', pos='a')[0]
+
+        translated = synset.translate()
+        assert any(s.id == synset.id for s in translated)
+
+        others = [s for s in translated if s.lang != synset.lang]
+        assert synset.lang not in {s.lang for s in others}
+        assert {s.lang for s in others} == {'de', 'fr'}
+
+    def test_bare_call_honours_the_configured_languages(self):
+        """Regression: translate() with no argument passed None to the backend,
+        which returns every installed lexicon regardless of what the Wordnet
+        was configured with. descriptions() already honoured the configuration,
+        so the two disagreed."""
+        wordnet = Wordnet(lang='de fr')
+        synset = wordnet.synsets('happy', pos='a')[0]
+        languages = {s.lang for s in synset.translate()}
+        assert languages == {'de', 'en', 'fr'}
+        assert 'it' not in languages
+
     def test_translate_by_ili(self):
         wordnet = Wordnet(lang='de')
         synset = wordnet.synsets('happy', pos='a')[0]
@@ -257,6 +339,112 @@ class _NoIliSynset:
 
 
 @skip_without_lexicon('hyde')
+@skip_without_lexicon('hyde')
+class TestCrossLingualLanguageConsistency:
+    """The three cross-lingual methods must agree on which languages they
+    cover, both when defaulting to the Wordnet's configuration and when given
+    an explicit selection."""
+
+    @pytest.mark.parametrize('configured', ['de fr', 'de fr it'])
+    def test_all_three_default_to_the_configured_languages(self, configured):
+        wordnet = Wordnet(lang=configured)
+        synset = wordnet.synsets('happy', pos='a')[0]
+
+        from_translate = {s.lang for s in synset.translate()}
+        from_descriptions = set(synset.descriptions())
+        from_definitions = set(synset.definitions())
+
+        assert from_translate == from_descriptions == from_definitions
+
+    def test_all_three_honour_an_explicit_selection(self):
+        wordnet = Wordnet(lang='de fr it')
+        synset = wordnet.synsets('happy', pos='a')[0]
+
+        assert {s.lang for s in synset.translate(lang='de fr')} == {'de', 'fr'}
+        assert set(synset.descriptions(lang='de fr')) == {'de', 'fr'}
+        assert set(synset.definitions(lang='de fr')) == {'de', 'fr'}
+
+    def test_own_language_is_present_in_both_mappings(self):
+        """descriptions() previously omitted the synset's own language,
+        returning an empty list for it, while definitions() included it. Both
+        now cover every requested language, and the own-language entries agree
+        with the singular accessors."""
+        wordnet = Wordnet(lang='de fr')
+        synset = wordnet.synsets('happy', pos='a')[0]
+
+        assert synset.descriptions()[synset.lang] == synset.lemmas()
+        assert synset.definitions()[synset.lang] == synset.definition()
+
+    def test_own_language_is_not_english_specific(self):
+        # The rule is "the synset's own language", not "English".
+        wordnet = Wordnet(lang='de fr')
+        german = next(s for s in wordnet.synsets('car') if s.lang == 'de')
+        descriptions = german.descriptions()
+        assert descriptions['de'] == german.lemmas()
+        assert descriptions['en']  # other languages still populated
+
+    def test_language_order_follows_the_configuration(self):
+        """The configured languages were deduplicated through a set, leaving
+        their order unspecified. Anything iterating them — the default
+        translate(), the machine-translation fallback — then varied between
+        runs."""
+        wordnet = Wordnet(lang='de fr es')
+        assert wordnet._wrapper.filterLang == ['en', 'de', 'fr', 'es']
+
+    def test_configuration_excludes_uninstalled_choices(self):
+        # Italian is installed but not configured, so it must not appear.
+        wordnet = Wordnet(lang='de')
+        synset = wordnet.synsets('happy', pos='a')[0]
+        assert 'it' not in {s.lang for s in synset.translate()}
+        assert 'it' not in synset.descriptions()
+        assert 'it' not in synset.definitions()
+
+
+@skip_without_lexicon('hyde')
+class TestSynsetDefinitions:
+    def test_defaults_to_all_configured_languages(self):
+        wordnet = Wordnet(lang='de fr it')
+        synset = wordnet.synsets('happy', pos='a')[0]
+        definitions = synset.definitions()
+        assert {'en', 'de', 'fr', 'it'} <= set(definitions)
+        assert all(isinstance(text, str) and text for text in definitions.values())
+
+    def test_definitions_differ_per_language(self):
+        wordnet = Wordnet(lang='de fr')
+        synset = wordnet.synsets('happy', pos='a')[0]
+        definitions = synset.definitions()
+        assert definitions['de'] != definitions['en']
+        assert definitions['fr'] != definitions['en']
+
+    def test_own_language_definition_matches_definition_method(self):
+        wordnet = Wordnet(lang='de')
+        synset = wordnet.synsets('happy', pos='a')[0]
+        assert synset.definitions()[synset.lang] == synset.definition()
+
+    @pytest.mark.parametrize('lang', ['de fr', 'de,fr', ['de', 'fr']])
+    def test_accepts_the_same_language_forms_as_translate(self, lang):
+        wordnet = Wordnet(lang='de fr it')
+        synset = wordnet.synsets('happy', pos='a')[0]
+        assert sorted(synset.definitions(lang=lang)) == ['de', 'fr']
+
+    def test_single_language_subselection(self):
+        wordnet = Wordnet(lang='de fr')
+        synset = wordnet.synsets('happy', pos='a')[0]
+        definitions = synset.definitions(lang='de')
+        assert list(definitions) == ['de']
+        assert definitions['de']
+
+    def test_unknown_language_raises_language_error(self):
+        wordnet = Wordnet(lang='de')
+        synset = wordnet.synsets('happy', pos='a')[0]
+        with pytest.raises(LanguageError):
+            synset.definitions(lang='not-a-lang')
+
+    def test_backend_without_ili_returns_empty_mapping(self):
+        synset = Wordnet(backend='nltk').synsets('house', pos='n')[0]
+        assert synset.definitions() == {}
+
+
 class TestSynsetDescriptions:
     def test_defaults_to_configured_languages(self):
         wordnet = Wordnet(lang='de fr')

@@ -19,8 +19,12 @@ class NltkWordNetWrapper(WordNetWrapper):
         if filterLang:
             self.filterLang = ['eng']
             for lang in filterLang.split(','):
-                self.filterLang.append(self.getWordnetLanguageCode(lang))
-            self.filterLang = list(set(self.filterLang))
+                code = self.getWordnetLanguageCode(lang)
+                # Deduplicate while preserving the caller's order: building
+                # this through a set leaves the order unspecified, which
+                # surfaces downstream wherever the list is iterated.
+                if code not in self.filterLang:
+                    self.filterLang.append(code)
         else:
             self.filterLang = ['eng', 'fra', 'ita', 'spa', 'por', 'nld']    
             

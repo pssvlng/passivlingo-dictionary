@@ -39,7 +39,7 @@ from passivlingo_dictionary.translationProviders.TranslationProvider import (
 )
 
 #: Keep in step with the version declared in setup.py.
-__version__ = '2.0.0'
+__version__ = '2.0.1'
 
 __all__ = (
     '__version__',
